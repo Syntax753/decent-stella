@@ -1,7 +1,7 @@
 # decent-stella
 Decent Story Teller App
 
-# Setup
+# Preflight
 * AI Setup
 
 Google One -> Sign up for Gemini Advanced (https://one.google.com/about/ai-premium/)
