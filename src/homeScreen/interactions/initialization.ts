@@ -4,8 +4,8 @@ import LLMDevPauseDialog from "@/homeScreen/dialogs/LLMDevPauseDialog";
 import { isServingLocally } from "@/developer/devEnvUtil";
 import { LOAD_URL } from "@/common/urlUtil";
 
-export async function init(setLocation:Function, setModalDialog:Function, systemMessage: string = STELLA_SYSTEM_MESSAGE) {
-  setSystemMessage(systemMessage);
+export async function init(setLocation:Function, setModalDialog:Function) {
+  setSystemMessage(STELLA_SYSTEM_MESSAGE);
   
   if (!isLlmConnected()) {
     if (isServingLocally()) {

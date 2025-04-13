@@ -22,6 +22,11 @@ function HomeScreen() {
     "the-fellowship-of-the-ring": "the-fellowship-of-the-ring.txt",
     "the-raven": "the-raven.txt",
   };
+
+   const CHARACTERS_SYSTEM_MESSAGE = "You love stories and characters in those stories." +
+    "You will be given a story and will list each character in that story." +
+    "You will summarise how the character talks to the other characters. " + 
+    "Respond in an array format with each character and their summary."
   
   useEffect(() => {
     init(setLocation, setModalDialog).then(() => { });
@@ -58,7 +63,7 @@ function HomeScreen() {
                 fetch(`/tales/${taleFileName}`)
                   .then(response => response.text())
                   .then((taleContent) => {
-                  submitPrompt(taleContent, setPrompt, _onRespond);
+                  submitPrompt("Tell me about the characters", setPrompt, _onRespond, CHARACTERS_SYSTEM_MESSAGE+" "+"Here is the story: " +"I am Peter and I have a story. It's a nice story.");
                   })
                   .catch(error => console.error('Error loading tale:', error));
               }

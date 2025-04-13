@@ -57,7 +57,8 @@ export async function generateWebLLM(connection:LLMConnection, llmMessages:LLMMe
     stream: true,
     messages,
     presence_penalty: .8,
-    frequency_penalty: .8
+    frequency_penalty: .8,
+    temperature: 0.0
   };
   addUserMessageToChatHistory(llmMessages, prompt);
   
