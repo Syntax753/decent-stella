@@ -43,6 +43,7 @@ function HomeScreen() {
         <p>
           <label htmlFor="taleSelection">Tale:</label>
           <select id="taleSelection" value={taleSelection} onChange={(e) => setTaleSelection(e.target.value)}>
+          <option value="">Select Your Tale of Yore</option>
             <option value="the-fellowship-of-the-ring">The Fellowship of the Ring</option>
           </select>
         </p>
