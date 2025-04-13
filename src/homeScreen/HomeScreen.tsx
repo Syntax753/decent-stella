@@ -15,6 +15,7 @@ function HomeScreen() {
   const [responseText, setResponseText] = useState<string>('');
   const [modalDialog, setModalDialog] = useState<string|null>(null);
   const [eyesState, setEyesState] = useState<string>('');
+  const [taleSelection, setTaleSelection] = useState<string>('the-fellowship-of-the-ring');
   const [, setLocation] = useLocation();
   
   useEffect(() => {
@@ -35,9 +36,18 @@ function HomeScreen() {
   
   return (
     <div className={styles.container}>
-      <div className={styles.header}><h1>Hi, I'm a screen.</h1></div>
+      <div className={styles.header}><h1>Welcome the Timeless Tavern where the Yarn of Yesteryear is Spun</h1></div>
       <div className={styles.content}>
-        <img src={eyesPng} alt="Eyes" className={`${styles.eyes} ${eyesState}`}/>
+        {/* <img src={eyesPng} alt="Eyes" className={`${styles.eyes} ${eyesState}`}/> */}
+       
+        <p>
+          <label htmlFor="taleSelection">Tale:</label>
+          <select id="taleSelection" value={taleSelection} onChange={(e) => setTaleSelection(e.target.value)}>
+            <option value="the-fellowship-of-the-ring">The Fellowship of the Ring</option>
+          </select>
+        </p>
+
+
         <p><input type="text" className={styles.promptBox} placeholder="Say anything to this screen" value={prompt} onKeyDown={_onKeyDown} onChange={(e) => setPrompt(e.target.value)}/>
         <ContentButton text="Send" onClick={() => submitPrompt(prompt, setPrompt, _onRespond)} /></p>
         {response}
