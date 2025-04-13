@@ -15,14 +15,19 @@ function HomeScreen() {
   const [responseText, setResponseText] = useState<string>('');
   const [modalDialog, setModalDialog] = useState<string|null>(null);
   const [eyesState, setEyesState] = useState<string>('');
-  const [taleSelection, setTaleSelection] = useState<string>('the-fellowship-of-the-ring');
+  const [taleSelection, setTaleSelection] = useState<string>('');
   const [, setLocation] = useLocation();
+
+  const taleMap: { [key: string]: string } = {
+    "the-fellowship-of-the-ring": "the-fellowship-of-the-ring.txt",
+    "the-hobbit": "the-hobbit.txt",
+  };
   
   useEffect(() => {
     init(setLocation, setModalDialog).then(() => { });
   }, []);
 
-  function _onKeyDown(e:React.KeyboardEvent<HTMLInputElement>) {
+  function onKeyDown(e:React.KeyboardEvent<HTMLInputElement>) {
     if(e.key === 'Enter' && prompt !== '') submitPrompt(prompt, setPrompt, _onRespond);
   }
 
@@ -32,7 +37,7 @@ function HomeScreen() {
     setEyesState(styles[`eyesState${stateNo}`]);
   }
 
-  const response = responseText === GENERATING ? <p>hmmm<WaitingEllipsis/></p> : <p>{responseText}</p>
+  const response = responseText === GENERATING ? <p>The Bard picks up her lute<WaitingEllipsis/></p> : <p>{responseText}</p>
   
   return (
     <div className={styles.container}>
@@ -42,15 +47,31 @@ function HomeScreen() {
        
         <p>
           <label htmlFor="taleSelection">Tale:</label>
-          <select id="taleSelection" value={taleSelection} onChange={(e) => setTaleSelection(e.target.value)}>
-          <option value="">Select Your Tale of Yore</option>
+            <select 
+            id="taleSelection" 
+            value={taleSelection} 
+            onChange={(e) => {
+              const selectedTale = e.target.value;
+              setTaleSelection(selectedTale);
+              const taleFileName = taleMap[selectedTale];
+              if (taleFileName) {
+                fetch(`/tales/${taleFileName}`)
+                  .then(response => response.text())
+                  .then((taleContent) => {
+                  submitPrompt(taleContent, setPrompt, _onRespond);
+                  })
+                  .catch(error => console.error('Error loading tale:', error));
+              }
+            }}
+            >
+            <option value="">Select Your Tale of Yore</option>
             <option value="the-fellowship-of-the-ring">The Fellowship of the Ring</option>
-          </select>
+            <option value="the-hobbit">The Hobbit</option>
+            </select>
         </p>
 
-
-        <p><input type="text" className={styles.promptBox} placeholder="Say anything to this screen" value={prompt} onKeyDown={_onKeyDown} onChange={(e) => setPrompt(e.target.value)}/>
-        <ContentButton text="Send" onClick={() => submitPrompt(prompt, setPrompt, _onRespond)} /></p>
+        {/* <p><input type="text" className={styles.promptBox} placeholder="Say anything to this screen" value={prompt} onKeyDown={_onKeyDown} onChange={(e) => setPrompt(e.target.value)}/>
+        <ContentButton text="Send" onClick={() => submitPrompt(prompt, setPrompt, _onRespond)} /></p> */}
         {response}
       </div>
 
