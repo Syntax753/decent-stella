@@ -20,6 +20,7 @@ IDE -> Firebase Studio (ex Project IDX) (https://studio.firebase.google.com/)
 1. cd decent-stella
 1. git init
 1. git config --global init.defaultBranch main
+1. git branch main
 1. git remote add origin https://github.com/Syntax753/decent-stella
 1. git pull origin main
 1. git add .
