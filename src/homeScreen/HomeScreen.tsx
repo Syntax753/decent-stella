@@ -21,7 +21,6 @@ function HomeScreen() {
   const taleMap: { [key: string]: string } = {
     "the-fellowship-of-the-ring": "the-fellowship-of-the-ring.txt",
     "the-raven": "the-raven.txt",
-    "the-hobbit": "the-hobbit.txt",
   };
   
   useEffect(() => {
@@ -66,8 +65,8 @@ function HomeScreen() {
             }}
             >
             <option value="">Select Your Tale of Yore</option>
-            <option value="the-fellowship-of-the-ring">The Fellowship of the Ring</option>
-            <option value="the-hobbit">The Hobbit</option>
+            <option value="the-fellowship-of-the-ring">The Fellowship of the Ring (Tolkien)</option>
+            <option value="the-raven">The Raven (Poe)</option>
             </select>
         </p>
 
