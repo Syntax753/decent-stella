@@ -20,6 +20,7 @@ function HomeScreen() {
 
   const taleMap: { [key: string]: string } = {
     "the-fellowship-of-the-ring": "the-fellowship-of-the-ring.txt",
+    "the-raven": "the-raven.txt",
     "the-hobbit": "the-hobbit.txt",
   };
   
