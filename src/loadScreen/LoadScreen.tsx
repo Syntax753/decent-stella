@@ -17,7 +17,7 @@ function LoadScreen() {
   
   return (
     <div className={styles.container}>
-      <div className={styles.header}><h1>Decent App - Loading</h1></div>
+      <div className={styles.header}><h1>Decent - a Story Teller - Loading</h1></div>
       <div className={styles.content}>
         <div className={styles.progressBarContainer}>
           <ProgressBar percentComplete={percentComplete}/>

@@ -59,7 +59,7 @@ import {createNonGlobalRegex, escapeRegexCharacters} from "@/common/regExUtil";
 
 const SCHEMA_VERSION = 1; // Only incremented if IndexedDb schema changes, which is decoupled from app data version.
 const APP_DATA_VERSION = 1; // Increment each time a production release is made where the format of values stored in KeyValueRecord changed.
-const DB_NAME = `Decent App-${SCHEMA_VERSION}`;
+const DB_NAME = `Decent - a Story Teller-${SCHEMA_VERSION}`;
 const KEY_VALUE_STORE = 'KeyValue';
 const PATH_INDEX_NAME = 'pathIndex';
 
