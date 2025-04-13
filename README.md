@@ -4,7 +4,7 @@ Decent Story Teller App
 # Preflight
 * AI Setup
 
-Google One -> Sign up for Gemini Advanced (https://one.google.com/about/ai-premium/)
+Google One -> Sign up for **Gemini Advanced** (https://one.google.com/about/ai-premium/)
 
 * GitHub Setup
 
@@ -42,16 +42,28 @@ npm install
 npm run dev
 ```
 
-# Prototype
-
-* Prompts are in **bold**
-
-
 # Dev
 
-# Testing
+1. Add application logic in homescreen/
+1. 
 
 # Contact
 
 [Via LinkedIn](https://www.linkedin.com/in/peterturnerlondon/)
 
+# Acknowledgements
+
+## Decent
+
+The [Decent](https://decentapps.net/) framework embeds an LLM into your local dev environment.
+
+This opens up development against an LLM to all!
+
+https://github.com/erikh2000/create-decent-app
+
+
+## Story Content
+
+The Fellowship of The Ring (TODO: check license):
+
+http://github.com/ganesh-k13/shell/blob/master/test_search/www.glozman.com/TextPages/01%20-%20The%20Fellowship%20Of%20The%20Ring.txt
