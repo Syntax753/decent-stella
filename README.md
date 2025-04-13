@@ -14,6 +14,10 @@ Create GitHub repo (https://github.com/Syntax753/decent-stella)
 
 IDE -> Firebase Studio (ex Project IDX) (https://studio.firebase.google.com/)
 
+**Note**
+
+The connection from Firebase Studio localhost is throttled. This means it is not a viable platform for running Decent apps. These should be run locally instead (VSCode, etc)
+
 # Setup
 
 ## Git
