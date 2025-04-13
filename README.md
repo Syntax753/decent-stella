@@ -16,14 +16,31 @@ IDE -> Firebase Studio (ex Project IDX) (https://studio.firebase.google.com/)
 
 # Setup
 
-1. npx create-decent-app decent-stella
-1. cd decent-stella
-1. git init
-1. git config --global init.defaultBranch main
-1. git branch main
-1. git remote add origin https://github.com/Syntax753/decent-stella
-1. git pull origin main
-1. git add .
+## Git
+
+```bash
+npx create-decent-app decent-stella
+cd decent-stella
+git init
+git config --global init.defaultBranch main
+git branch main
+git remote add origin https://github.com/Syntax753/decent-stella
+git pull origin main
+git add .
+git push
+```
+
+## Node
+
+```bash
+npm install
+```
+
+# Runtime
+
+```bash
+npm run dev
+```
 
 # Prototype
 
