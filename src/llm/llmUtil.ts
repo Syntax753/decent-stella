@@ -67,7 +67,7 @@ export function clearChatHistory() {
 }
 
 export async function generate(prompt:string, onStatusUpdate:StatusUpdateCallback):Promise<string> {
-  console.info('setSystemMessage', messages.systemMessage);
+  console.info('system', messages.systemMessage);
   console.info('prompt', prompt)
 
   if (!isInitialized()) throw Error('LLM connection is not initialized.');

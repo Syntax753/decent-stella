@@ -14,6 +14,7 @@ export async function submitPrompt(prompt:string, setPrompt:Function, setRespons
     try {
       
       if (!isLlmConnected()) { 
+        console.log("Generate LLM not connected")
         const message = isServingLocally() 
         ? `LLM is not connected. You're in a dev environment where this is expected (hot reloads, canceling the LLM load). You can refresh the page to load the LLM.`
         : 'LLM is not connected. Try refreshing the page.';
