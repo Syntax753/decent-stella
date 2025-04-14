@@ -30,13 +30,6 @@ function HomeScreen() {
     "You are carrying a lute and are sitting in the Timeless Tavern. " +
     "An adventurer enters the tavern and sits at a nearby table."
 
-  // const BARD_PROMPT =
-  //   "Introduce the tavern to the traveller and sing a song of mighty deeds and heroes. " +
-  //   "The song should be in the form of a limerick. " + 
-  //   "Format the output using markdown. " +
-  //   "Talk of yourself in the 3rd person as The Bard. " +
-  //   "Put a newline character after each sentence"
-
   const BARD_PROMPT =
     "Tell a single limerick about heroes and dragons and epic tales. " +
     "Invite the traveller to your table " +
@@ -48,7 +41,10 @@ function HomeScreen() {
     "For example "+
     "[John]|Very friendly and likes apples [Mary]|Very contrary and likes the sunrise [Paul]|Local blacksmith who enjoys long walks " +
     "Do not include an introduction. " +
-    "Do not include any other information. "
+    "Do not include any other information. " + 
+    "Then describe every event in the story and list those who took part in it. " +
+    "For example "+
+    "[Going to the school]Peter,Alice [Picking up the shopping]Suzette [Buying a car]Jonathan"
 
   useEffect(() => {
     init(setLocation, setModalDialog).then(() => { });
@@ -76,13 +72,15 @@ function HomeScreen() {
     <div className={styles.container}>
       <div className={styles.header}><h1>Welcome the Timeless Tavern where the Yarn of Yesteryear is Spun</h1></div>
       <div className={styles.content}>
-        {bardIntro}
+        {bardIntro}<ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_PROMPT, setBardIntroText, _onBardIntro, BARD_SYSTEM_MESSAGE)} />
+        <br />
+        <br />
+        <br />
         <p>
-          <label htmlFor="taleSelection">Tales of Yore</label><br />
+          <label htmlFor="taleSelection">Tales of Yore</label><br /><br />
           {<select
             id="taleSelection"
             value={taleSelection}
-            onClickCapture={(e) => submitPrompt(BARD_PROMPT, setBardIntroText, _onBardIntro, BARD_SYSTEM_MESSAGE)}
             onChange={(e) => {
               const selectedTale = e.target.value;
               setTaleSelection(selectedTale);
@@ -115,3 +113,17 @@ function HomeScreen() {
 }
 
 export default HomeScreen;
+
+
+
+
+
+
+
+
+  // const BARD_PROMPT =
+  //   "Introduce the tavern to the traveller and sing a song of mighty deeds and heroes. " +
+  //   "The song should be in the form of a limerick. " + 
+  //   "Format the output using markdown. " +
+  //   "Talk of yourself in the 3rd person as The Bard. " +
+  //   "Put a newline character after each sentence"
