@@ -42,9 +42,9 @@ function HomeScreen() {
     "[John]|Very friendly and likes apples [Mary]|Very contrary and likes the sunrise [Paul]|Local blacksmith who enjoys long walks " +
     "Do not include an introduction. " +
     "Do not include any other information. " + 
-    "Then describe every event in the story and list those who took part in it. " +
+    "Then describe every event involving 2 or more people and list those who took part in it. " +
     "For example "+
-    "[Going to the school]Peter,Alice [Picking up the shopping]Suzette [Buying a car]Jonathan"
+    "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan"
 
   useEffect(() => {
     init(setLocation, setModalDialog).then(() => { });
