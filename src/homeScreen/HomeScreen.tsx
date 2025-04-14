@@ -19,6 +19,7 @@ function HomeScreen() {
   const [, setLocation] = useLocation();
 
   const taleMap: { [key: string]: string } = {
+    "the-story-of-syntax-and-the-little-dog": "the-story-of-syntax-and-the-little-dog.txt",
     "the-fellowship-of-the-ring": "the-fellowship-of-the-ring.txt",
     "the-raven": "the-raven.txt",
   };
@@ -51,7 +52,7 @@ function HomeScreen() {
         {/* <img src={eyesPng} alt="Eyes" className={`${styles.eyes} ${eyesState}`}/> */}
        
         <p>
-          <label htmlFor="taleSelection">Tale:</label>
+          <label htmlFor="taleSelection">Tales of Yore</label><br/>
             <select 
             id="taleSelection" 
             value={taleSelection} 
@@ -63,13 +64,14 @@ function HomeScreen() {
                 fetch(`/tales/${taleFileName}`)
                   .then(response => response.text())
                   .then((taleContent) => {
-                  submitPrompt("Tell me about the characters", setPrompt, _onRespond, CHARACTERS_SYSTEM_MESSAGE+" "+"Here is the story: " +"I am Peter and I have a story. It's a nice story.");
+                  submitPrompt(taleContent, setPrompt, _onRespond, CHARACTERS_SYSTEM_MESSAGE);
                   })
                   .catch(error => console.error('Error loading tale:', error));
               }
             }}
             >
-            <option value="">Select Your Tale of Yore</option>
+            <option value="">Select your journey</option>
+            <option value="the-story-of-syntax-and-the-little-dog">The Story of Syntax and the Little Dog (Syntax)</option>
             <option value="the-fellowship-of-the-ring">The Fellowship of the Ring (Tolkien)</option>
             <option value="the-raven">The Raven (Poe)</option>
             </select>
