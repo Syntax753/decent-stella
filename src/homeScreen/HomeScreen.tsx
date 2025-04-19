@@ -37,7 +37,7 @@ function HomeScreen() {
     "Format the output using markdown. "
 
   const CHARACTERS_SYSTEM_MESSAGE = `
-Name all the characters in the story along with their personality in a json object.
+Name all the characters in the story along with their personality.
 Do not include characters that do not have a personality.
 
 1. Collect the character and personality from the story and populate the json.
@@ -48,7 +48,7 @@ Do not include characters that do not have a personality.
 - Example 1:
 
 {"name":"The Minotaur","ego":"Very friendly and likes apples"}
-{"name":"Icarus", "ego":"Loves flying and sunny days" }
+{"name":"Icarus","ego":"Loves flying and sunny days" }
 
 - Example 2:
 
@@ -124,17 +124,17 @@ Do not include characters that do not have a personality.
               const selectedTale = e.target.value;
               if (selectedTale === 'default') {
                 setResponseText('');
-                return;
-              }
-              setTaleSelection(selectedTale);
-              const taleFileName = taleMap[selectedTale];
-              if (taleFileName) {
-                fetch(`/tales/${taleFileName}`)
-                  .then(response => response.text())
-                  .then((taleContent) => {
-                    submitPrompt(taleContent, setPrompt, _onRespond, CHARACTERS_SYSTEM_MESSAGE);
-                  })
-                  .catch(error => console.error('Error loading tale:', error));
+              } else {
+                setTaleSelection(selectedTale);
+                const taleFileName = taleMap[selectedTale];
+                if (taleFileName) {
+                  fetch(`/tales/${taleFileName}`)
+                    .then(response => response.text())
+                    .then((taleContent) => {
+                      submitPrompt(taleContent, setPrompt, _onRespond, CHARACTERS_SYSTEM_MESSAGE, true);
+                    })
+                    .catch(error => console.error('Error loading tale:', error));
+                }
               }
             }}
           >

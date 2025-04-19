@@ -21,7 +21,7 @@ function chunkString(str: string, chunkSize: number) {
   return chunks;
 }
 
-export async function submitPrompt(prompt: string, setPrompt: Function, setResponseText: Function, systemMessage: string = STELLA_SYSTEM_MESSAGE) {
+export async function submitPrompt(prompt: string, setPrompt: Function, setResponseText: Function, systemMessage: string = STELLA_SYSTEM_MESSAGE, infinityMode: boolean = false) {
 
   let output = '';
   let current = '';
@@ -45,22 +45,25 @@ export async function submitPrompt(prompt: string, setPrompt: Function, setRespo
     }
 
     // Single prompt
-    // generate(prompt, (status:string) => setResponseText(status));
-
+    if (!infinityMode) {
+      generate(prompt, (status: string) => setResponseText(status));
+      setPrompt('');
+    }
     // Multiple prompts
     // TODO: Chunk based on sentences with total chars < MAX_CHARS
-    const chunks = chunkString(prompt, MAX_CHARS);
-    for (const chunk of chunks) {
-      output = await generate(chunk, (status: string) => chunkedOutput(status), true);
-      console.log(output);
-      current += output;
+    else {
+      const chunks = chunkString(prompt, MAX_CHARS);
+      for (const chunk of chunks) {
+        output = await generate(chunk, (status: string) => chunkedOutput(status), infinityMode);
+        console.log(output);
+        current += output;
+        setResponseText(current);
+      }
+
       setResponseText(current);
+      current = '';
     }
-
-    setResponseText(current);
-    current = '';
-
-    setPrompt('');
+    
   } catch (e) {
     console.error('Error while generating response.', e);
     setResponseText('Error while generating response.');
