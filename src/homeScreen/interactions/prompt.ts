@@ -1,6 +1,6 @@
 import { isServingLocally } from "@/developer/devEnvUtil";
 import { generate, isLlmConnected, setSystemMessage } from "@/llm/llmUtil";
-import { mergeEgosFromJSONStrings, formatMapToString } from "@/data/conversion";
+import { mergeEgosFromJSONStrings } from "@/data/conversion";
 
 const MAX_CHARS: number = 500;
 
@@ -22,7 +22,7 @@ function chunkString(str: string, chunkSize: number) {
   return chunks;
 }
 
-export async function submitPrompt(prompt: string, setPrompt: Function, setResponseText: Function, systemMessage: string = STELLA_SYSTEM_MESSAGE, infinityMode: boolean = false) {
+export async function submitPrompt(prompt: string, systemMessage: string = STELLA_SYSTEM_MESSAGE, _onResponse: Function, infinityMode: boolean = false) {
 
   let output = '';
   let current = '';
@@ -32,7 +32,7 @@ export async function submitPrompt(prompt: string, setPrompt: Function, setRespo
   }
 
   setSystemMessage(systemMessage);
-  setResponseText(GENERATING);
+  _onResponse(GENERATING);
 
   try {
 
@@ -41,14 +41,13 @@ export async function submitPrompt(prompt: string, setPrompt: Function, setRespo
       const message = isServingLocally()
         ? `LLM is not connected. You're in a dev environment where this is expected (hot reloads, canceling the LLM load). You can refresh the page to load the LLM.`
         : 'LLM is not connected. Try refreshing the page.';
-      setResponseText(message);
+      _onResponse(message);
       return;
     }
 
     // Single prompt
     if (!infinityMode) {
-      generate(prompt, (status: string) => setResponseText(status));
-      setPrompt('');
+      generate(prompt, (status: string) => _onResponse(status));
     }
     // Multiple prompts
     // TODO: Chunk based on sentences with total chars < MAX_CHARS
@@ -57,10 +56,9 @@ export async function submitPrompt(prompt: string, setPrompt: Function, setRespo
       let egoMap = new Map<string, string>();
       for (const chunk of chunks) {
         output = await generate(chunk, (status: string) => chunkedOutput(status), infinityMode);
+        
         egoMap = mergeEgosFromJSONStrings([output], egoMap, ". ");
-
-        console.log(output, egoMap);
-        setResponseText(formatMapToString(egoMap));
+        _onResponse(egoMap);
       }
 
       current = '';
@@ -68,6 +66,6 @@ export async function submitPrompt(prompt: string, setPrompt: Function, setRespo
 
   } catch (e) {
     console.error('Error while generating response.', e);
-    setResponseText('Error while generating response.');
+    _onResponse('Error while generating response.');
   }
 }

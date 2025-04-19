@@ -1,24 +1,29 @@
 import WaitingEllipsis from '@/components/waitingEllipsis/WaitingEllipsis';
 import styles from './HomeScreen.module.css';
-import eyesPng from './images/eyes.png';
 import { init } from "./interactions/initialization";
 import { GENERATING, submitPrompt } from "./interactions/prompt";
-
-import DangerousHtml from '@/components/dangerousHtml/DangerousHtml';
 import ContentButton from '@/components/contentButton/ContentButton';
 import { useEffect, useState } from "react";
 import LLMDevPauseDialog from './dialogs/LLMDevPauseDialog';
 import { useLocation } from 'wouter';
 import { LOAD_URL } from '@/common/urlUtil';
 
+import { formatMapToString } from "@/data/conversion";
+
 function HomeScreen() {
-  const [prompt, setPrompt] = useState<string>('');
+  // Output
   const [bardIntroText, setBardIntroText] = useState<string>('The Bard beckons your to her table');
-  const [responseText, setResponseText] = useState<string>('');
-  const [modalDialog, setModalDialog] = useState<string | null>(null);
-  const [eyesState, setEyesState] = useState<string>('');
-  const [taleSelection, setTaleSelection] = useState<string>('');
+  const [charactersEgoText, setCharactersEgoText] = useState<string>('');
+
+  // Data Structs
+  const [egoMap, setEgoMap] = useState<Map<string, string>>(new Map<string, string>());
+
+  // UX
   const [, setLocation] = useLocation();
+  const [modalDialog, setModalDialog] = useState<string | null>(null);
+  const [taleSelection, setTaleSelection] = useState<string>('');
+
+  // const [eventMap, setEventMap] = useState<Map<string, string>>(new Map<string, string>());
 
   const taleMap: { [key: string]: string } = {
     "the-story-of-syntax-and-the-little-dog": "the-story-of-syntax-and-the-little-dog.txt",
@@ -89,34 +94,37 @@ Do not include characters that do not have a personality.
     init(setLocation, setModalDialog).then(() => { });
   })
 
-  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter' && prompt !== '') submitPrompt(prompt, setPrompt, _onRespond);
 
-  }
-
-  function _onRespond(text: string) {
-    setResponseText(text);
-    const stateNo = Math.floor(Math.random() * 5) + 1;
-    setEyesState(styles[`eyesState${stateNo}`]);
-  }
-
-  function _onBardIntro(text: string) {
+  // UI Updates
+  function _onBardResponse(text: string) {
     setBardIntroText(text);
   }
 
-  function _onTaleCharacterRespond(text: string) {
-    setResponseText(text);
+  // function _onCharactersResponse(text: string) {
+  //   setCharactersEgoText(text);
+  // }
+
+  // Data Structure updates
+  function _onCharactersEgoResponse(ego: string | Map<string, string>) {
+    if (typeof ego === 'string') {
+      setCharactersEgoText(ego);
+    } else {
+      setEgoMap(ego);
+      setCharactersEgoText(formatMapToString(ego));
+    }
   }
 
-  const bardIntro = bardIntroText === GENERATING ? <p>The Bard beckons you to her table<WaitingEllipsis /></p> : <p>{bardIntroText}</p>
-  const response = responseText === GENERATING ? <p>The Bard picks up her lute<WaitingEllipsis /></p> : <p>{responseText}</p>
+  const bardIntroDOM = bardIntroText === GENERATING ? <p>The Bard beckons you to her table<WaitingEllipsis /></p> : <p>{bardIntroText}</p>
+  const charactersEgoDOM = charactersEgoText === GENERATING ? <p>The Bard picks up her lute<WaitingEllipsis /></p> : <p>{charactersEgoText}</p>
 
   return (
     <div className={styles.container}>
       <div className={styles.header}><h1>Welcome the Timeless Tavern where the Yarn of Yesteryear is Spun</h1></div>
       <div className={styles.content}>
-        {bardIntro}<ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_PROMPT, setBardIntroText, _onBardIntro, BARD_SYSTEM_MESSAGE)} />
+
+        {bardIntroDOM}
         <br />
+        <ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_PROMPT, BARD_SYSTEM_MESSAGE, _onBardResponse)} />
         <br />
         <br />
         <p>
@@ -127,7 +135,8 @@ Do not include characters that do not have a personality.
             onChange={(e) => {
               const selectedTale = e.target.value;
               if (selectedTale === 'default') {
-                setResponseText('');
+                // TODO: Update the dropdown to match the 'top' default selection value. Doesn't update currently
+                setCharactersEgoText('');
               } else {
                 setTaleSelection(selectedTale);
                 const taleFileName = taleMap[selectedTale];
@@ -135,7 +144,7 @@ Do not include characters that do not have a personality.
                   fetch(`/tales/${taleFileName}`)
                     .then(response => response.text())
                     .then((taleContent) => {
-                      submitPrompt(taleContent, setPrompt, _onTaleCharacterRespond, CHARACTERS_SYSTEM_MESSAGE, true);
+                      submitPrompt(taleContent, CHARACTERS_SYSTEM_MESSAGE, _onCharactersEgoResponse, true);
                     })
                     .catch(error => console.error('Error loading tale:', error));
                 }
@@ -152,7 +161,7 @@ Do not include characters that do not have a personality.
 
         {/* <p><input type="text" className={styles.promptBox} placeholder="Say anything to this screen" value={prompt} onKeyDown={_onKeyDown} onChange={(e) => setPrompt(e.target.value)}/>
         <ContentButton text="Send" onClick={() => submitPrompt(prompt, setPrompt, _onRespond)} /></p> */}
-        {response}
+        {charactersEgoDOM}
       </div>
 
       <LLMDevPauseDialog isOpen={modalDialog === LLMDevPauseDialog.name} onConfirm={() => setLocation(LOAD_URL)} onCancel={() => setModalDialog(null)} />
@@ -161,12 +170,6 @@ Do not include characters that do not have a personality.
 }
 
 export default HomeScreen;
-
-
-
-
-
-
 
 
 // const BARD_PROMPT =
