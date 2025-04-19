@@ -36,30 +36,35 @@ function HomeScreen() {
     "Invite the traveller to your table " +
     "Format the output using markdown. "
 
-  const CHARACTERS_SYSTEM_MESSAGE =
-    `List each character which has a capitalised name and their personality in a json object.
+  const CHARACTERS_SYSTEM_MESSAGE = `
+Name all the characters in the story along with their personality in a json object.
+Do not include characters that do not have a personality.
 
-1. Collect the character and personality information from the story that will populate the json.
+1. Collect the character and personality from the story and populate the json.
 2. The fields in the json are
   - Name: This is the character's name
   - Ego: This is the character's personality
 
 - Example 1:
 
-{"name":"John","ego":"Very friendly and likes apples"}
+{"name":"The Minotaur","ego":"Very friendly and likes apples"}
+{"name":"Icarus", "ego":"Loves flying and sunny days" }
 
 - Example 2:
 
-{"name":"Mary","ego":"Loves to sing and likes butterflies"}
+{"name":"Mary","ego":"Quite contrary and loves silver bells"}
+{"name":"Humpty","ego":"Loves eating omelettes"}
 
 - Example 3:
 
-{"name":"Paul","ego":"Local blacksmith who enjoys long walks"}
+{"name":"Beethro","ego":"Enjoys exploring dangerous rooms"}
+{"name":"Halp","ego":"Causes trouble whereever he goes - but is helpful too"}
 
-- Check for and correct any syntax errors in the json format
-- Only respond with json objects.
 - Do not provide an introduction.
-- If a character doesn't have specific details about their personalities, don't include them`
+- Only respond with json objects.
+- Check for and correct any syntax errors in the json format.
+- If a character doesn't have specific details about their personalities, don't include them.
+`
 
   const EVENTS_SYSTEM_MESSAGE =
     "You will be given a story and will list each event in that story. " +
@@ -117,7 +122,7 @@ function HomeScreen() {
             value={taleSelection}
             onChange={(e) => {
               const selectedTale = e.target.value;
-              if (!selectedTale) {
+              if (selectedTale === 'default') {
                 setResponseText('');
                 return;
               }
@@ -133,7 +138,7 @@ function HomeScreen() {
               }
             }}
           >
-            <option value="">Select your journey</option>
+            <option value="default">Select your journey</option>
             <option value="the-story-of-syntax-and-the-little-dog">The Story of Syntax and the Little Dog (Syntax)</option>
             <option value="the-famous-five-on-treasure-island">The Famous Five on Treasure Island (Blyton)</option>
             <option value="the-fellowship-of-the-ring">The Fellowship of the Ring (Tolkien)</option>

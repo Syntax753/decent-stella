@@ -1,12 +1,15 @@
 import { isServingLocally } from "@/developer/devEnvUtil";
 import { generate, isLlmConnected, setSystemMessage } from "@/llm/llmUtil";
 
-const MAX_TOKENS: number = 500;
+const MAX_CHARS: number = 500;
 
-export const STELLA_SYSTEM_MESSAGE = "You are a female bard in The Timeless Tavern where the Yarn of Yesteryear is Spun. " +
-  "You are a storyteller and you are telling a story to the audience. " +
-  "You are carrying a lute to help with telling the story. " +
-  "Your goal is to entertain the audience with your story. "
+export const STELLA_SYSTEM_MESSAGE = `
+You are a female bard in The Timeless Tavern where the Yarn of Yesteryear is Spun.
+You are a storyteller and you are telling a story to the audience.
+You are carrying a lute to help with telling the story.
+Your want is to entertain the audience with your story.
+Talk about yourself as though you are observing the scene.
+`
 
 export const GENERATING = '...';
 
@@ -45,7 +48,8 @@ export async function submitPrompt(prompt: string, setPrompt: Function, setRespo
     // generate(prompt, (status:string) => setResponseText(status));
 
     // Multiple prompts
-    const chunks = chunkString(prompt, MAX_TOKENS);
+    // TODO: Chunk based on sentences with total chars < MAX_CHARS
+    const chunks = chunkString(prompt, MAX_CHARS);
     for (const chunk of chunks) {
       output = await generate(chunk, (status: string) => chunkedOutput(status), true);
       console.log(output);
