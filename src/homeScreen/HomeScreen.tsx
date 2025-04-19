@@ -104,6 +104,10 @@ Do not include characters that do not have a personality.
     setBardIntroText(text);
   }
 
+  function _onTaleCharacterRespond(text: string) {
+    setResponseText(text);
+  }
+
   const bardIntro = bardIntroText === GENERATING ? <p>The Bard beckons you to her table<WaitingEllipsis /></p> : <p>{bardIntroText}</p>
   const response = responseText === GENERATING ? <p>The Bard picks up her lute<WaitingEllipsis /></p> : <p>{responseText}</p>
 
@@ -131,7 +135,7 @@ Do not include characters that do not have a personality.
                   fetch(`/tales/${taleFileName}`)
                     .then(response => response.text())
                     .then((taleContent) => {
-                      submitPrompt(taleContent, setPrompt, _onRespond, CHARACTERS_SYSTEM_MESSAGE, true);
+                      submitPrompt(taleContent, setPrompt, _onTaleCharacterRespond, CHARACTERS_SYSTEM_MESSAGE, true);
                     })
                     .catch(error => console.error('Error loading tale:', error));
                 }

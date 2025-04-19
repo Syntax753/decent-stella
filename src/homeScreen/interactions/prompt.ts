@@ -1,5 +1,6 @@
 import { isServingLocally } from "@/developer/devEnvUtil";
 import { generate, isLlmConnected, setSystemMessage } from "@/llm/llmUtil";
+import { mergeEgosFromJSONStrings, formatMapToString } from "@/data/conversion";
 
 const MAX_CHARS: number = 500;
 
@@ -53,17 +54,18 @@ export async function submitPrompt(prompt: string, setPrompt: Function, setRespo
     // TODO: Chunk based on sentences with total chars < MAX_CHARS
     else {
       const chunks = chunkString(prompt, MAX_CHARS);
+      let egoMap = new Map<string, string>();
       for (const chunk of chunks) {
         output = await generate(chunk, (status: string) => chunkedOutput(status), infinityMode);
-        console.log(output);
-        current += output;
-        setResponseText(current);
+        egoMap = mergeEgosFromJSONStrings([output], egoMap, ". ");
+
+        console.log(output, egoMap);
+        setResponseText(formatMapToString(egoMap));
       }
 
-      setResponseText(current);
       current = '';
     }
-    
+
   } catch (e) {
     console.error('Error while generating response.', e);
     setResponseText('Error while generating response.');
