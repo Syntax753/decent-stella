@@ -34,20 +34,37 @@ function HomeScreen() {
   const BARD_PROMPT =
     "Tell a single limerick about heroes and dragons and epic tales. " +
     "Invite the traveller to your table " +
-    "Format the output using markdown. " 
-  
+    "Format the output using markdown. "
+
   const CHARACTERS_SYSTEM_MESSAGE =
-    "You will be given a story and will list each character in that story. " +
-    "Please respond with just the name of the character and their attitudes. " +
-    "For example " +
-    "[John]|Very friendly and likes apples [Mary]|Very contrary and likes the sunrise [Paul]|Local blacksmith who enjoys long walks " +
-    "Do not include an introduction. " +
-    "Do not include any other information. "
-  
+    `List each character which has a capitalised name and their personality in a json object.
+
+1. Collect the character and personality information from the story that will populate the json.
+2. The fields in the json are
+  - Name: This is the character's name
+  - Ego: This is the character's personality
+
+- Example 1:
+
+{"name":"John","ego":"Very friendly and likes apples"}
+
+- Example 2:
+
+{"name":"Mary","ego":"Loves to sing and likes butterflies"}
+
+- Example 3:
+
+{"name":"Paul","ego":"Local blacksmith who enjoys long walks"}
+
+- Check for and correct any syntax errors in the json format
+- Only respond with json objects.
+- Do not provide an introduction.
+- If a character doesn't have specific details about their personalities, don't include them`
+
   const EVENTS_SYSTEM_MESSAGE =
     "You will be given a story and will list each event in that story. " +
     "Describe every event involving 2 or more people and list those who took part in it. " +
-    "For example "+
+    "For example " +
     "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan " +
     "Do not include an introduction. " +
     "Do not include any other information. "
@@ -55,12 +72,12 @@ function HomeScreen() {
   const CHARACTERS_EVENTS_SYSTEM_MESSAGE =
     "You will be given a story and will list each character in that story. " +
     "Please respond with just the name of the character and their attitudes. " +
-    "For example "+
+    "For example " +
     "[John]|Very friendly and likes apples [Mary]|Very contrary and likes the sunrise [Paul]|Local blacksmith who enjoys long walks " +
     "Do not include an introduction. " +
-    "Do not include any other information. " + 
+    "Do not include any other information. " +
     "Then describe every event involving 2 or more people and list those who took part in it. " +
-    "For example "+
+    "For example " +
     "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan"
 
   useEffect(() => {
@@ -100,6 +117,10 @@ function HomeScreen() {
             value={taleSelection}
             onChange={(e) => {
               const selectedTale = e.target.value;
+              if (!selectedTale) {
+                setResponseText('');
+                return;
+              }
               setTaleSelection(selectedTale);
               const taleFileName = taleMap[selectedTale];
               if (taleFileName) {
@@ -139,9 +160,9 @@ export default HomeScreen;
 
 
 
-  // const BARD_PROMPT =
-  //   "Introduce the tavern to the traveller and sing a song of mighty deeds and heroes. " +
-  //   "The song should be in the form of a limerick. " + 
-  //   "Format the output using markdown. " +
-  //   "Talk of yourself in the 3rd person as The Bard. " +
-  //   "Put a newline character after each sentence"
+// const BARD_PROMPT =
+//   "Introduce the tavern to the traveller and sing a song of mighty deeds and heroes. " +
+//   "The song should be in the form of a limerick. " +
+//   "Format the output using markdown. " +
+//   "Talk of yourself in the 3rd person as The Bard. " +
+//   "Put a newline character after each sentence"
