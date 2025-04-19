@@ -10,7 +10,7 @@ import { LOAD_URL } from "@/common/urlUtil";
 
 export async function init(setLocation:Function, setModalDialog:Function) {
   console.log("Init LLM")
-  setSystemMessage(STELLA_SYSTEM_MESSAGE);
+  // setSystemMessage(STELLA_SYSTEM_MESSAGE);
   
   // while (!isLlmConnected) {
   //   console.log("Retry LLM")

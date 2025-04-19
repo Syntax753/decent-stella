@@ -22,6 +22,7 @@ function HomeScreen() {
 
   const taleMap: { [key: string]: string } = {
     "the-story-of-syntax-and-the-little-dog": "the-story-of-syntax-and-the-little-dog.txt",
+    "the-famous-five-on-treasure-island": "the-famous-five-on-treasure-island.txt",
     "the-fellowship-of-the-ring": "the-fellowship-of-the-ring.txt",
     "the-raven": "the-raven.txt",
   };
@@ -36,6 +37,22 @@ function HomeScreen() {
     "Format the output using markdown. " 
   
   const CHARACTERS_SYSTEM_MESSAGE =
+    "You will be given a story and will list each character in that story. " +
+    "Please respond with just the name of the character and their attitudes. " +
+    "For example " +
+    "[John]|Very friendly and likes apples [Mary]|Very contrary and likes the sunrise [Paul]|Local blacksmith who enjoys long walks " +
+    "Do not include an introduction. " +
+    "Do not include any other information. "
+  
+  const EVENTS_SYSTEM_MESSAGE =
+    "You will be given a story and will list each event in that story. " +
+    "Describe every event involving 2 or more people and list those who took part in it. " +
+    "For example "+
+    "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan " +
+    "Do not include an introduction. " +
+    "Do not include any other information. "
+
+  const CHARACTERS_EVENTS_SYSTEM_MESSAGE =
     "You will be given a story and will list each character in that story. " +
     "Please respond with just the name of the character and their attitudes. " +
     "For example "+
@@ -97,6 +114,7 @@ function HomeScreen() {
           >
             <option value="">Select your journey</option>
             <option value="the-story-of-syntax-and-the-little-dog">The Story of Syntax and the Little Dog (Syntax)</option>
+            <option value="the-famous-five-on-treasure-island">The Famous Five on Treasure Island (Blyton)</option>
             <option value="the-fellowship-of-the-ring">The Fellowship of the Ring (Tolkien)</option>
             <option value="the-raven">The Raven (Poe)</option>
           </select>}
