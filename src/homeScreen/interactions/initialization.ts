@@ -1,5 +1,4 @@
-import { isLlmConnected, setSystemMessage } from "@/llm/llmUtil";
-import { STELLA_SYSTEM_MESSAGE } from "./prompt";
+import { isLlmConnected } from "@/llm/llmUtil";
 import LLMDevPauseDialog from "@/homeScreen/dialogs/LLMDevPauseDialog";
 import { isServingLocally } from "@/developer/devEnvUtil";
 import { LOAD_URL } from "@/common/urlUtil";
