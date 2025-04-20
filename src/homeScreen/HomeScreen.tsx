@@ -14,6 +14,7 @@ function HomeScreen() {
   // Output
   const [bardIntroText, setBardIntroText] = useState<string>('The Bard beckons your to her table');
   const [charactersEgoText, setCharactersEgoText] = useState<string>('');
+  const [characterEgoDOM, setCharacterEgoDOM] = useState<string>('');
 
   // Data Structs
   const [egoMap, setEgoMap] = useState<Map<string, string>>(new Map<string, string>());
@@ -22,6 +23,7 @@ function HomeScreen() {
   const [, setLocation] = useLocation();
   const [modalDialog, setModalDialog] = useState<string | null>(null);
   const [taleSelection, setTaleSelection] = useState<string>('');
+  const [characterSelection, setSelectedCharacter] = useState<string>('');
 
   // const [eventMap, setEventMap] = useState<Map<string, string>>(new Map<string, string>());
 
@@ -94,15 +96,10 @@ Do not include characters that do not have a personality.
     init(setLocation, setModalDialog).then(() => { });
   })
 
-
   // UI Updates
   function _onBardResponse(text: string) {
     setBardIntroText(text);
   }
-
-  // function _onCharactersResponse(text: string) {
-  //   setCharactersEgoText(text);
-  // }
 
   // Data Structure updates
   function _onCharactersEgoResponse(ego: string | Map<string, string>) {
@@ -158,10 +155,35 @@ Do not include characters that do not have a personality.
             <option value="the-raven">The Raven (Poe)</option>
           </select>}
         </p>
-
+        <br />
+        {egoMap.size > 0 && (
+          <p>
+            <label htmlFor="characterSelection">The Hall of Heroes</label><br /><br />
+            {<select
+              id="characterSelection"
+              value={characterSelection}
+              onChange={(e) => { 
+                let characterPrompt = egoMap.get(e.target.value);
+                if (!characterPrompt) {
+                  console.error('Missing ego', e.target.value);
+                } else {
+                  setCharacterEgoDOM(characterPrompt);
+                }
+              }
+              }>
+              <option value="">Select your Hero</option>
+              {egoMap.keys().map(name => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>}
+            <p>
+            {characterEgoDOM}
+            </p>
+          </p>)}
+        
         {/* <p><input type="text" className={styles.promptBox} placeholder="Say anything to this screen" value={prompt} onKeyDown={_onKeyDown} onChange={(e) => setPrompt(e.target.value)}/>
         <ContentButton text="Send" onClick={() => submitPrompt(prompt, setPrompt, _onRespond)} /></p> */}
-        {charactersEgoDOM}
+        {/* {charactersEgoDOM} */}
       </div>
 
       <LLMDevPauseDialog isOpen={modalDialog === LLMDevPauseDialog.name} onConfirm={() => setLocation(LOAD_URL)} onCancel={() => setModalDialog(null)} />
