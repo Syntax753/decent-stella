@@ -16,7 +16,7 @@ function HomeScreen() {
   const [characterResponseText, setCharacterResponseText] = useState<string>('');
 
   const [charactersEgoText, setCharactersEgoText] = useState<string>('');
-  const [characterEgo, setCharacterEgoDOM] = useState<string>('');
+  const [characterEgo, setCharacterEgo] = useState<string>('');
 
   // Data Structs
   const [egoMap, setEgoMap] = useState<Map<string, string>>(new Map<string, string>());
@@ -181,14 +181,14 @@ Do not include characters that do not have a personality.
                 // Reset
                 setCharacterResponseText('');
                 setCharacterPrompt('');
-                setCharacterEgoDOM('');
+                setCharacterEgo('');
 
-                let characterPrompt = egoMap.get(selectedCharacter);
-                if (!characterPrompt) {
+                let characterEgo = egoMap.get(selectedCharacter);
+                if (!characterEgo) {
                   console.error('Missing ego', selectedCharacter);
                 } else {
 
-                  setCharacterEgoDOM(characterPrompt);
+                  setCharacterEgo(characterEgo);
                 }
               }
               }>
@@ -200,13 +200,8 @@ Do not include characters that do not have a personality.
             {characterEgo && <input type="text" className={styles.promptBox} placeholder={characterEgo} value={characterPrompt} onChange={(e) => setCharacterPrompt(e.target.value)}/>}
             {characterPrompt && <ContentButton text="Send" onClick={() => submitPrompt("Your name is "+characterSelection+". This is your personality: "+characterPrompt, characterEgo, _onCharacterResponse)}/>}
             {characterResponseText && <p>{characterResponseText}</p>}
-            {/* && <ContentButton text="Send" onClick={() => submitPrompt(characterPrompt, characterEgoDOM, _onCharacterResponse)} /> && characterResponseText)} */}
 
           </p>)}
-        
-        {/* <p><input type="text" className={styles.promptBox} placeholder="Say anything to this screen" value={prompt} onKeyDown={_onKeyDown} onChange={(e) => setPrompt(e.target.value)}/>
-        <ContentButton text="Send" onClick={() => submitPrompt(prompt, setPrompt, _onRespond)} /></p> */}
-        {/* {charactersEgoDOM} */}
       </div>
 
       <LLMDevPauseDialog isOpen={modalDialog === LLMDevPauseDialog.name} onConfirm={() => setLocation(LOAD_URL)} onCancel={() => setModalDialog(null)} />
