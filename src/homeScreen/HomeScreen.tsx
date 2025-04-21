@@ -13,8 +13,10 @@ import { formatMapToString } from "@/data/conversion";
 function HomeScreen() {
   // Output
   const [bardIntroText, setBardIntroText] = useState<string>('The Bard beckons your to her table');
+  const [characterResponseText, setCharacterResponseText] = useState<string>('');
+
   const [charactersEgoText, setCharactersEgoText] = useState<string>('');
-  const [characterEgoDOM, setCharacterEgoDOM] = useState<string>('');
+  const [characterEgo, setCharacterEgoDOM] = useState<string>('');
 
   // Data Structs
   const [egoMap, setEgoMap] = useState<Map<string, string>>(new Map<string, string>());
@@ -23,7 +25,8 @@ function HomeScreen() {
   const [, setLocation] = useLocation();
   const [modalDialog, setModalDialog] = useState<string | null>(null);
   const [taleSelection, setTaleSelection] = useState<string>('');
-  const [characterSelection, setSelectedCharacter] = useState<string>('');
+  const [characterSelection, setCharacterSelection] = useState<string>('');
+  const [characterPrompt, setCharacterPrompt] = useState<string>('');
 
   // const [eventMap, setEventMap] = useState<Map<string, string>>(new Map<string, string>());
 
@@ -111,8 +114,16 @@ Do not include characters that do not have a personality.
     }
   }
 
+  // Data Structure updates
+  function _onCharacterResponse(text: string) {
+    setCharacterResponseText(text);
+  }
+
+  
+
   const bardIntroDOM = bardIntroText === GENERATING ? <p>The Bard beckons you to her table<WaitingEllipsis /></p> : <p>{bardIntroText}</p>
-  const charactersEgoDOM = charactersEgoText === GENERATING ? <p>The Bard picks up her lute<WaitingEllipsis /></p> : <p>{charactersEgoText}</p>
+  // const charactersEgoDOM = charactersEgoText === GENERATING ? <p>The Bard picks up her lute<WaitingEllipsis /></p> : <p>{charactersEgoText}</p>
+  // const character
 
   return (
     <div className={styles.container}>
@@ -135,6 +146,7 @@ Do not include characters that do not have a personality.
                 // TODO: Update the dropdown to match the 'top' default selection value. Doesn't update currently
                 setCharactersEgoText('');
               } else {
+                egoMap.clear();
                 setTaleSelection(selectedTale);
                 const taleFileName = taleMap[selectedTale];
                 if (taleFileName) {
@@ -163,10 +175,19 @@ Do not include characters that do not have a personality.
               id="characterSelection"
               value={characterSelection}
               onChange={(e) => { 
-                let characterPrompt = egoMap.get(e.target.value);
+                const selectedCharacter = e.target.value;
+                setCharacterSelection(selectedCharacter);
+
+                // Reset
+                setCharacterResponseText('');
+                setCharacterPrompt('');
+                setCharacterEgoDOM('');
+
+                let characterPrompt = egoMap.get(selectedCharacter);
                 if (!characterPrompt) {
-                  console.error('Missing ego', e.target.value);
+                  console.error('Missing ego', selectedCharacter);
                 } else {
+
                   setCharacterEgoDOM(characterPrompt);
                 }
               }
@@ -176,9 +197,11 @@ Do not include characters that do not have a personality.
                 <option key={name} value={name}>{name}</option>
               ))}
             </select>}
-            <p>
-            {characterEgoDOM}
-            </p>
+            {characterEgo && <input type="text" className={styles.promptBox} placeholder={characterEgo} value={characterPrompt} onChange={(e) => setCharacterPrompt(e.target.value)}/>}
+            {characterPrompt && <ContentButton text="Send" onClick={() => submitPrompt("Your name is "+characterSelection+". This is your personality: "+characterPrompt, characterEgo, _onCharacterResponse)}/>}
+            {characterResponseText && <p>{characterResponseText}</p>}
+            {/* && <ContentButton text="Send" onClick={() => submitPrompt(characterPrompt, characterEgoDOM, _onCharacterResponse)} /> && characterResponseText)} */}
+
           </p>)}
         
         {/* <p><input type="text" className={styles.promptBox} placeholder="Say anything to this screen" value={prompt} onKeyDown={_onKeyDown} onChange={(e) => setPrompt(e.target.value)}/>
