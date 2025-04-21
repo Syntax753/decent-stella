@@ -9,6 +9,7 @@ import { useLocation } from 'wouter';
 import { LOAD_URL } from '@/common/urlUtil';
 
 import { formatMapToString } from "@/data/conversion";
+import ProgressBar from '@/components/progressBar/ProgressBar';
 
 function HomeScreen() {
   // Output
@@ -27,6 +28,10 @@ function HomeScreen() {
   const [taleSelection, setTaleSelection] = useState<string>('');
   const [characterSelection, setCharacterSelection] = useState<string>('');
   const [characterPrompt, setCharacterPrompt] = useState<string>('');
+
+  // Progress bar
+  const [percentComplete, setPercentComplete] = useState<number>(0.0);
+  const [currentTask, setCurrentTask] = useState<string>('');
 
   // const [eventMap, setEventMap] = useState<Map<string, string>>(new Map<string, string>());
 
@@ -119,7 +124,12 @@ Do not include characters that do not have a personality.
     setCharacterResponseText(text);
   }
 
-  
+  function _onProgressBarUpdate(percent: number, task: string) {
+    setPercentComplete(percent);
+    if (task) {
+      setCurrentTask(task);
+    }
+  }
 
   const bardIntroDOM = bardIntroText === GENERATING ? <p>The Bard beckons you to her table<WaitingEllipsis /></p> : <p>{bardIntroText}</p>
   // const charactersEgoDOM = charactersEgoText === GENERATING ? <p>The Bard picks up her lute<WaitingEllipsis /></p> : <p>{charactersEgoText}</p>
@@ -129,44 +139,54 @@ Do not include characters that do not have a personality.
     <div className={styles.container}>
       <div className={styles.header}><h1>Welcome the Timeless Tavern where the Yarn of Yesteryear is Spun</h1></div>
       <div className={styles.content}>
-
         {bardIntroDOM}
         <br />
         <ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_PROMPT, BARD_SYSTEM_MESSAGE, _onBardResponse)} />
         <br />
         <br />
-        <p>
-          <label htmlFor="taleSelection">Tales of Yore</label><br /><br />
-          {<select
-            id="taleSelection"
-            value={taleSelection}
-            onChange={(e) => {
-              const selectedTale = e.target.value;
-              if (selectedTale === 'default') {
-                // TODO: Update the dropdown to match the 'top' default selection value. Doesn't update currently
-                setCharactersEgoText('');
-              } else {
-                egoMap.clear();
-                setTaleSelection(selectedTale);
-                const taleFileName = taleMap[selectedTale];
-                if (taleFileName) {
-                  fetch(`/tales/${taleFileName}`)
-                    .then(response => response.text())
-                    .then((taleContent) => {
-                      submitPrompt(taleContent, CHARACTERS_SYSTEM_MESSAGE, _onCharactersEgoResponse, true);
-                    })
-                    .catch(error => console.error('Error loading tale:', error));
-                }
+
+        <hr />
+        <br />
+
+        <label htmlFor="taleSelection">Tales of Yore</label><br /><br />
+        {<select
+          id="taleSelection"
+          value={taleSelection}
+          onChange={(e) => {
+            const selectedTale = e.target.value;
+
+            // Progress bar
+            const selectElement = e.target as HTMLSelectElement;
+            const selectedIndex = selectElement.selectedIndex;
+            const selectedTaleTitle = selectElement.options[selectedIndex].text;
+            _onProgressBarUpdate(0, 'The Bard picks up her Lute, and Recounts the Tale of ' + selectedTaleTitle);
+
+            if (selectedTale === 'default') {
+              // TODO: Update the dropdown to match the 'top' default selection value. Doesn't update currently
+              setCharactersEgoText('');
+            } else {
+              egoMap.clear();
+              setTaleSelection(selectedTale);
+              const taleFileName = taleMap[selectedTale];
+              if (taleFileName) {
+                fetch(`/tales/${taleFileName}`)
+                  .then(response => response.text())
+                  .then((taleContent) => {
+                    submitPrompt(taleContent, CHARACTERS_SYSTEM_MESSAGE, _onCharactersEgoResponse, true, _onProgressBarUpdate);
+                  })
+                  .catch(error => console.error('Error loading tale:', error));
               }
-            }}
-          >
-            <option value="default">Select your journey</option>
-            <option value="the-story-of-syntax-and-the-little-dog">The Story of Syntax and the Little Dog (Syntax)</option>
-            <option value="the-famous-five-on-treasure-island">The Famous Five on Treasure Island (Blyton)</option>
-            <option value="the-fellowship-of-the-ring">The Fellowship of the Ring (Tolkien)</option>
-            <option value="the-raven">The Raven (Poe)</option>
-          </select>}
-        </p>
+            }
+          }}
+        >
+          <option value="default">Select your journey</option>
+          <option value="the-story-of-syntax-and-the-little-dog">The Story of Syntax and the Little Dog (Syntax)</option>
+          <option value="the-famous-five-on-treasure-island">The Famous Five on Treasure Island (Blyton)</option>
+          <option value="the-fellowship-of-the-ring">The Fellowship of the Ring (Tolkien)</option>
+          <option value="the-raven">The Raven (Poe)</option>
+        </select>}
+
+        <br />
         <br />
         {egoMap.size > 0 && (
           <p>
@@ -174,7 +194,7 @@ Do not include characters that do not have a personality.
             {<select
               id="characterSelection"
               value={characterSelection}
-              onChange={(e) => { 
+              onChange={(e) => {
                 const selectedCharacter = e.target.value;
                 setCharacterSelection(selectedCharacter);
 
@@ -197,13 +217,26 @@ Do not include characters that do not have a personality.
                 <option key={name} value={name}>{name}</option>
               ))}
             </select>}
-            {characterEgo && <input type="text" className={styles.promptBox} placeholder={characterEgo} value={characterPrompt} onChange={(e) => setCharacterPrompt(e.target.value)}/>}
-            {characterPrompt && <ContentButton text="Send" onClick={() => submitPrompt("Your name is "+characterSelection+". This is your personality: "+characterPrompt, characterEgo, _onCharacterResponse)}/>}
+            {characterEgo && <input type="text" className={styles.promptBox} placeholder={characterEgo} value={characterPrompt} onChange={(e) => setCharacterPrompt(e.target.value)} />}
+            {characterPrompt && <ContentButton text="Send" onClick={() => submitPrompt("Your name is " + characterSelection + ". This is your personality: " + characterPrompt, characterEgo, _onCharacterResponse)} />}
             {characterResponseText && <p>{characterResponseText}</p>}
+
+            <br />
+            <br />
+            <br />
+            <br />
+            {currentTask && (
+
+              <div className={styles.progressBarContainer}>
+                <ProgressBar percentComplete={percentComplete} />
+                {currentTask} {(percentComplete*100).toFixed(1)}%<WaitingEllipsis />
+              </div>
+            )}
 
           </p>)}
       </div>
 
+      <br />
       <LLMDevPauseDialog isOpen={modalDialog === LLMDevPauseDialog.name} onConfirm={() => setLocation(LOAD_URL)} onCancel={() => setModalDialog(null)} />
     </div>
   );

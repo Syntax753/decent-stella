@@ -22,7 +22,7 @@ function chunkString(str: string, chunkSize: number) {
   return chunks;
 }
 
-export async function submitPrompt(prompt: string, systemMessage: string = STELLA_SYSTEM_MESSAGE, _onResponse: Function, infinityMode: boolean = false) {
+export async function submitPrompt(prompt: string, systemMessage: string = STELLA_SYSTEM_MESSAGE, _onResponse: Function, infinityMode: boolean = false, _onProgress?: Function) {
 
   let output = '';
   let current = '';
@@ -52,13 +52,19 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
     // Multiple prompts
     // TODO: Chunk based on sentences with total chars < MAX_CHARS
     else {
+      
+      let task = '';
+
       const chunks = chunkString(prompt, MAX_CHARS);
+
       let egoMap = new Map<string, string>();
-      for (const chunk of chunks) {
-        output = await generate(chunk, (status: string) => chunkedOutput(status), infinityMode);
-        
+      for (let idx = 0; idx < chunks.length; idx++) {
+        output = await generate(chunks[idx], (status: string) => chunkedOutput(status), infinityMode);
+
         egoMap = mergeEgosFromJSONStrings([output], egoMap, ". ");
         _onResponse(egoMap);
+
+        if (_onProgress) { _onProgress((idx+1)/chunks.length), task};
       }
 
       current = '';

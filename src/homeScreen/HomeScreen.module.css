@@ -97,3 +97,9 @@
 .eyesState5 {
   transform: rotate(0deg);
 }
+
+.progressBarContainer {
+    height: 2vh;
+    width: 100%;
+
+}
