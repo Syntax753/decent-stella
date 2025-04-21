@@ -31,9 +31,8 @@ function HomeScreen() {
 
   // Progress bar
   const [percentComplete, setPercentComplete] = useState<number>(0.0);
+  const [estimateComplete, setEstimateComplete] = useState<string>('');
   const [currentTask, setCurrentTask] = useState<string>('');
-
-  // const [eventMap, setEventMap] = useState<Map<string, string>>(new Map<string, string>());
 
   const taleMap: { [key: string]: string } = {
     "the-story-of-syntax-and-the-little-dog": "the-story-of-syntax-and-the-little-dog.txt",
@@ -124,10 +123,15 @@ Do not include characters that do not have a personality.
     setCharacterResponseText(text);
   }
 
-  function _onProgressBarUpdate(percent: number, task: string) {
+  function _onProgressBarUpdate(percent: number, task: string = '', remainingFmt: string = '') {
+    console.log('Progress Bar', percent, task, remainingFmt);
     setPercentComplete(percent);
-    if (task) {
-      setCurrentTask(task);
+    // setCurrentTask(task);
+    if (percent === 1) {
+      setEstimateComplete('The Bard puts down her Lute, as the Story has Come To Be in The Timeless Tavern...');
+    } else {
+      console.log('Remaining', remainingFmt);
+      setEstimateComplete(remainingFmt);
     }
   }
 
@@ -139,27 +143,31 @@ Do not include characters that do not have a personality.
     <div className={styles.container}>
       <div className={styles.header}><h1>Welcome the Timeless Tavern where the Yarn of Yesteryear is Spun</h1></div>
       <div className={styles.content}>
-        {bardIntroDOM}
-        <br />
-        <ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_PROMPT, BARD_SYSTEM_MESSAGE, _onBardResponse)} />
-        <br />
-        <br />
+        <p>
+          {bardIntroDOM}
+          <br />
+          <ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_PROMPT, BARD_SYSTEM_MESSAGE, _onBardResponse)} />
+        </p>
 
+        <br />
         <hr />
         <br />
 
+        {/* Tale Select */}
         <label htmlFor="taleSelection">Tales of Yore</label><br /><br />
         {<select
           id="taleSelection"
           value={taleSelection}
           onChange={(e) => {
-            const selectedTale = e.target.value;
 
-            // Progress bar
+            // Init
+            const selectedTale = e.target.value;
             const selectElement = e.target as HTMLSelectElement;
             const selectedIndex = selectElement.selectedIndex;
             const selectedTaleTitle = selectElement.options[selectedIndex].text;
-            _onProgressBarUpdate(0, 'The Bard picks up her Lute, and Recounts the Tale of ' + selectedTaleTitle);
+
+            // Init Progress Bar
+            setCurrentTask('The Bard picks up her Lute, and Sings the Tale of ' + selectedTaleTitle);
 
             if (selectedTale === 'default') {
               // TODO: Update the dropdown to match the 'top' default selection value. Doesn't update currently
@@ -188,6 +196,7 @@ Do not include characters that do not have a personality.
 
         <br />
         <br />
+        {/* Character Select */}
         {egoMap.size > 0 && (
           <p>
             <label htmlFor="characterSelection">The Hall of Heroes</label><br /><br />
@@ -216,24 +225,37 @@ Do not include characters that do not have a personality.
               {egoMap.keys().map(name => (
                 <option key={name} value={name}>{name}</option>
               ))}
-            </select>}
+            </select>
+            }
+
             {characterEgo && <input type="text" className={styles.promptBox} placeholder={characterEgo} value={characterPrompt} onChange={(e) => setCharacterPrompt(e.target.value)} />}
-            {characterPrompt && <ContentButton text="Send" onClick={() => submitPrompt("Your name is " + characterSelection + ". This is your personality: " + characterPrompt, characterEgo, _onCharacterResponse)} />}
-            {characterResponseText && <p>{characterResponseText}</p>}
-
-            <br />
-            <br />
-            <br />
-            <br />
-            {currentTask && (
-
-              <div className={styles.progressBarContainer}>
-                <ProgressBar percentComplete={percentComplete} />
-                {currentTask} {(percentComplete*100).toFixed(1)}%<WaitingEllipsis />
-              </div>
-            )}
 
           </p>)}
+
+        {/* Character Input */}
+        <p>
+          {characterPrompt && <ContentButton text="Send" onClick={() => submitPrompt("Your name is " + characterSelection + ". This is your personality: " + characterPrompt, characterEgo, _onCharacterResponse)} />}
+        </p>
+
+        {/* Character Output */}
+        <p>
+          {characterResponseText && <p>{characterResponseText}</p>}
+        </p>
+
+        {/* Progress Bar */}
+        <p>
+          <br />
+          <br />
+          {currentTask && (
+
+            <div className={styles.progressBarContainer}>
+              {currentTask} {(percentComplete * 100).toFixed(1)}%<WaitingEllipsis />
+              <ProgressBar percentComplete={percentComplete} />
+              {estimateComplete}
+            </div>
+          )}
+        </p>
+
       </div>
 
       <br />

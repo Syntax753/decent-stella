@@ -22,6 +22,20 @@ function chunkString(str: string, chunkSize: number) {
   return chunks;
 }
 
+const formatTime = (ms: number) => {
+  const seconds = Math.floor((ms / 1000) % 60);
+  const minutes = Math.floor((ms / (1000 * 60)) % 60);
+  const hours = Math.floor(ms / (1000 * 60 * 60));
+
+  const parts = [];
+  if (hours > 0) parts.push(`${hours} hours`);
+  if (minutes > 0) parts.push(`${minutes} minutes`);
+  // if (seconds > 0 || parts.length === 0) parts.push(`${seconds.toFixed(2)} seconds`);
+  if (seconds > 0 || parts.length === 0) parts.push(`${seconds.toFixed(0)} seconds`);
+
+  return parts.join(', ');
+};
+
 export async function submitPrompt(prompt: string, systemMessage: string = STELLA_SYSTEM_MESSAGE, _onResponse: Function, infinityMode: boolean = false, _onProgress?: Function) {
 
   let output = '';
@@ -54,17 +68,28 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
     else {
       
       let task = '';
+      let egoMap = new Map<string, string>();
 
       const chunks = chunkString(prompt, MAX_CHARS);
 
-      let egoMap = new Map<string, string>();
+      let startTime = performance.now();
       for (let idx = 0; idx < chunks.length; idx++) {
         output = await generate(chunks[idx], (status: string) => chunkedOutput(status), infinityMode);
 
         egoMap = mergeEgosFromJSONStrings([output], egoMap, ". ");
         _onResponse(egoMap);
 
-        if (_onProgress) { _onProgress((idx+1)/chunks.length), task};
+        let percent = (idx+1)/chunks.length;
+
+        let endTime = performance.now();
+        let elapsed = endTime - startTime;
+        // console.log("Elapsed time: " + elapsed + "ms");
+        let remaining = (elapsed / percent) * (1 - percent);
+        // console.log("Remaining: " + remaining);
+        let remainingFmt = formatTime(remaining);
+        // console.log("Remaining fmt: " + remainingFmt);
+        
+        if (_onProgress) { _onProgress(percent, task, remainingFmt)};
       }
 
       current = '';
