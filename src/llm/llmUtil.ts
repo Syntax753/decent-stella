@@ -70,8 +70,8 @@ export async function generate(prompt: string, systemMessage: string, onStatusUp
 
   if (!isInitialized()) throw Error('LLM connection is not initialized.');
 
-  console.info('system', systemMessage);
-  console.info('prompt', prompt)
+  // console.info('system', systemMessage);
+  // console.info('prompt', prompt)
 
   // Wait for the LLM to be in the READY state
   await waitForLLMReady();

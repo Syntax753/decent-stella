@@ -124,13 +124,13 @@ Do not include characters that do not have a personality.
   }
 
   function _onProgressBarUpdate(percent: number, task: string = '', remainingFmt: string = '') {
-    console.log('Progress Bar', percent, task, remainingFmt);
+    // console.log('Progress Bar', percent, task, remainingFmt);
     setPercentComplete(percent);
     // setCurrentTask(task);
     if (percent === 1) {
       setEstimateComplete('The Bard puts down her Lute, as the Story has Come To Be in The Timeless Tavern...');
     } else {
-      console.log('Remaining', remainingFmt);
+      // console.log('Remaining', remainingFmt);
       setEstimateComplete(remainingFmt);
     }
   }
@@ -197,10 +197,10 @@ Do not include characters that do not have a personality.
         <br />
         <br />
         {/* Character Select */}
-        {egoMap.size > 0 && (
-          <p>
-            <label htmlFor="characterSelection">The Hall of Heroes</label><br /><br />
-            {<select
+        <p>
+          {egoMap.size > 0 && (
+
+            <><label htmlFor="characterSelection">The Hall of Heroes</label><br /><br /><select
               id="characterSelection"
               value={characterSelection}
               onChange={(e) => {
@@ -219,22 +219,46 @@ Do not include characters that do not have a personality.
 
                   setCharacterEgo(characterEgo);
                 }
-              }
-              }>
+              }}>
               <option value="">Select your Hero</option>
               {egoMap.keys().map(name => (
-                <option key={name} value={name}>{name}</option>
-              ))}
-            </select>
-            }
+                <option key={name} value={name}>{name}</option>))}
+            </select></>
+          )}
 
-            {characterEgo && <input type="text" className={styles.promptBox} placeholder={characterEgo} value={characterPrompt} onChange={(e) => setCharacterPrompt(e.target.value)} />}
+          {characterEgo && (
+            <input
+              type="text"
+              className={styles.promptBox}
+              placeholder={characterEgo}
+              value={characterPrompt}
+              onChange={(e) => {
+                setCharacterPrompt(e.target.value);
 
-          </p>)}
+              }}
+            />
+          )}
+
+        </p>
 
         {/* Character Input */}
         <p>
-          {characterPrompt && <ContentButton text="Send" onClick={() => submitPrompt("Your name is " + characterSelection + ". This is your personality: " + characterEgo, characterPrompt, _onCharacterResponse)} />}
+          {characterPrompt && (
+            <ContentButton
+              text="Send"
+              onClick={() => {
+                let systemPrompt =
+                  "Your name is " + characterSelection + " and you are an adventurer. You should answer any questions with this personality: " + characterEgo + ".";
+                console.log("System prompt: ", systemPrompt);
+                console.log("Prompt: ", characterPrompt);
+                submitPrompt(
+                  systemPrompt,
+                  characterPrompt,
+                  _onCharacterResponse
+                );
+              }}
+            />
+          )}
         </p>
 
         {/* Character Output */}
