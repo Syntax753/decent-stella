@@ -234,7 +234,7 @@ Do not include characters that do not have a personality.
 
         {/* Character Input */}
         <p>
-          {characterPrompt && <ContentButton text="Send" onClick={() => submitPrompt("Your name is " + characterSelection + ". This is your personality: " + characterPrompt, characterEgo, _onCharacterResponse)} />}
+          {characterPrompt && <ContentButton text="Send" onClick={() => submitPrompt("Your name is " + characterSelection + ". This is your personality: " + characterEgo, characterPrompt, _onCharacterResponse)} />}
         </p>
 
         {/* Character Output */}

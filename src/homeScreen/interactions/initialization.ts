@@ -8,7 +8,7 @@ import { LOAD_URL } from "@/common/urlUtil";
 // }
 
 export async function init(setLocation:Function, setModalDialog:Function) {
-  console.log("Init LLM")
+  // console.log("Init LLM")
   // setSystemMessage(STELLA_SYSTEM_MESSAGE);
   
   // while (!isLlmConnected) {
@@ -23,6 +23,6 @@ export async function init(setLocation:Function, setModalDialog:Function) {
     }
     setLocation(LOAD_URL); // First arrival to screen with LLM not loaded. Go load it and come back.
   } else {
-    console.log("LLM Connected")
+    // console.log("LLM Connected")
   }
 }

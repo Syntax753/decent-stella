@@ -3,7 +3,7 @@ enum LLMConnectionState {
   INITIALIZING,
   INIT_FAILED,
   READY,
-  GENERATING
+  GENERATING,
 }
 
 export default LLMConnectionState;

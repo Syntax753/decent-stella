@@ -36,6 +36,10 @@ const formatTime = (ms: number) => {
   return parts.join(', ');
 };
 
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function submitPrompt(prompt: string, systemMessage: string = STELLA_SYSTEM_MESSAGE, _onResponse: Function, infinityMode: boolean = false, _onProgress?: Function) {
 
   let output = '';
@@ -61,12 +65,12 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
 
     // Single prompt
     if (!infinityMode) {
-      generate(prompt, (status: string) => _onResponse(status));
+      generate(prompt, systemMessage, (status: string) => _onResponse(status));
     }
     // Multiple prompts
     // TODO: Chunk based on sentences with total chars < MAX_CHARS
     else {
-      
+
       let task = '';
       let egoMap = new Map<string, string>();
 
@@ -74,22 +78,21 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
 
       let startTime = performance.now();
       for (let idx = 0; idx < chunks.length; idx++) {
-        output = await generate(chunks[idx], (status: string) => chunkedOutput(status), infinityMode);
+        output = await generate(chunks[idx],systemMessage, (status: string) => chunkedOutput(status), infinityMode);
 
         egoMap = mergeEgosFromJSONStrings([output], egoMap, ". ");
         _onResponse(egoMap);
 
-        let percent = (idx+1)/chunks.length;
+        let percent = (idx + 1) / chunks.length;
 
         let endTime = performance.now();
         let elapsed = endTime - startTime;
-        // console.log("Elapsed time: " + elapsed + "ms");
         let remaining = (elapsed / percent) * (1 - percent);
-        // console.log("Remaining: " + remaining);
         let remainingFmt = formatTime(remaining);
-        // console.log("Remaining fmt: " + remainingFmt);
-        
-        if (_onProgress) { _onProgress(percent, task, remainingFmt)};
+
+        if (_onProgress) { _onProgress(percent, task, remainingFmt) };
+
+        await delay(100); // Delay for 100 ms so user input can be proceessed
       }
 
       current = '';

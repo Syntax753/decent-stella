@@ -63,17 +63,26 @@ export function restoreChatConfiguration() {
 }
 
 export function clearChatHistory() {
-  messages.chatHistory = []; 
+  messages.chatHistory = [];
 }
 
-export async function generate(prompt: string, onStatusUpdate: StatusUpdateCallback, infinityMode:boolean=false): Promise<string> {
-  // console.info('system', messages.systemMessage);
-  // console.info('prompt', prompt)
+export async function generate(prompt: string, systemMessage: string, onStatusUpdate: StatusUpdateCallback, infinityMode: boolean = false): Promise<string> {
 
   if (!isInitialized()) throw Error('LLM connection is not initialized.');
-  if (theConnection.state !== LLMConnectionState.READY) throw Error('LLM is not in ready state.');
+
+  console.info('system', systemMessage);
+  console.info('prompt', prompt)
+
+  // Wait for the LLM to be in the READY state
+  await waitForLLMReady();
+
+  clearChatHistory();
+  setSystemMessage(systemMessage);
+
+  // if (theConnection.state !== LLMConnectionState.READY) throw Error('LLM is not in ready state.');
   theConnection.state = LLMConnectionState.GENERATING;
   let message = '';
+
   switch (theConnection.connectionType) {
     case LLMConnectionType.WEBLLM: message = await generateWebLLM(theConnection, messages, prompt, onStatusUpdate, infinityMode); break;
     case LLMConnectionType.OLLAMA: message = await generateOllama(theConnection, messages, prompt, onStatusUpdate); break;
@@ -81,4 +90,27 @@ export async function generate(prompt: string, onStatusUpdate: StatusUpdateCallb
   }
   theConnection.state = LLMConnectionState.READY;
   return message;
+}
+
+async function waitForLLMReady(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (theConnection.state === LLMConnectionState.READY) {
+      resolve();
+      return;
+    }
+
+    const checkInterval = setInterval(() => {
+      if (theConnection.state === LLMConnectionState.READY) {
+        clearInterval(checkInterval);
+        resolve();
+      }
+    }, 50); // Check every 50 milliseconds (adjust as needed)
+
+    // Optional: Add a timeout to prevent indefinite waiting
+    setTimeout(() => {
+      clearInterval(checkInterval);
+      console.error('Timeout waiting for LLM to be ready.');
+      reject(new Error('Timeout waiting for LLM to be ready.'));
+    }, 100000); // Wait for 100 seconds
+  });
 }
