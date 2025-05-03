@@ -4,10 +4,11 @@ import { init } from "./interactions/initialization";
 import { GENERATING, submitPrompt } from "./interactions/prompt";
 import ContentButton from '@/components/contentButton/ContentButton';
 import { useEffect, useState } from "react";
-import LLMDevPauseDialog from './dialogs/LLMDevPauseDialog';
-import { useLocation } from 'wouter';
-import { LOAD_URL } from '@/common/urlUtil';
 
+import LoadScreen from '@/loadScreen/LoadScreen';
+import TopBar from '@/components/topBar/TopBar';
+
+// Custom Stella
 import { formatMapToString } from "@/data/conversion";
 import ProgressBar from '@/components/progressBar/ProgressBar';
 
@@ -16,6 +17,7 @@ function HomeScreen() {
   const [bardIntroText, setBardIntroText] = useState<string>('The Bard beckons your to her table');
   const [characterResponseText, setCharacterResponseText] = useState<string>('');
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [charactersEgoText, setCharactersEgoText] = useState<string>('');
   const [characterEgo, setCharacterEgo] = useState<string>('');
 
@@ -23,7 +25,6 @@ function HomeScreen() {
   const [egoMap, setEgoMap] = useState<Map<string, string>>(new Map<string, string>());
 
   // UX
-  const [, setLocation] = useLocation();
   const [modalDialog, setModalDialog] = useState<string | null>(null);
   const [taleSelection, setTaleSelection] = useState<string>('');
   const [characterSelection, setCharacterSelection] = useState<string>('');
@@ -100,8 +101,14 @@ Do not include characters that do not have a personality.
     "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan"
 
   useEffect(() => {
-    init(setLocation, setModalDialog).then(() => { });
-  })
+    if (isLoading) return;
+
+    init().then(isLlmConnected => { 
+      if (!isLlmConnected) setIsLoading(true);
+    });
+  }, [isLoading]);
+
+  if (isLoading) return <LoadScreen onComplete={() => setIsLoading(false)} />;
 
   // UI Updates
   function _onBardResponse(text: string) {
@@ -141,6 +148,7 @@ Do not include characters that do not have a personality.
 
   return (
     <div className={styles.container}>
+      <TopBar />
       <div className={styles.header}><h1>Welcome the Timeless Tavern where the Yarn of Yesteryear is Spun</h1></div>
       <div className={styles.content}>
         <p>
@@ -283,7 +291,7 @@ Do not include characters that do not have a personality.
       </div>
 
       <br />
-      <LLMDevPauseDialog isOpen={modalDialog === LLMDevPauseDialog.name} onConfirm={() => setLocation(LOAD_URL)} onCancel={() => setModalDialog(null)} />
+      {/* <LLMDevPauseDialog isOpen={modalDialog === LLMDevPauseDialog.name} onConfirm={() => setLocation(LOAD_URL)} onCancel={() => setModalDialog(null)} /> */}
     </div>
   );
 }

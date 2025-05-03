@@ -1,4 +1,4 @@
-import { init as initLlm } from "@/llm/llmUtil.ts";
+import { connect } from "@/llm/llmUtil.ts";
 
 let isInitialized = false;
 let isInitializing = false;
@@ -29,7 +29,7 @@ export async function init(setPercentComplete:Function, setCurrenTask:Function):
       setCurrenTask(status);
     }
 
-    await initLlm(_onStatusUpdate);
+    await connect(_onStatusUpdate);
     isInitialized = true;
     return true;
   } catch(e) {
