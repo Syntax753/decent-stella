@@ -68,7 +68,6 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
       generate(prompt, systemMessage, (status: string) => _onResponse(status));
     }
     // Multiple prompts
-    // TODO: Chunk based on sentences with total chars < MAX_CHARS
     else {
 
       let task = '';
@@ -78,7 +77,7 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
 
       let startTime = performance.now();
       for (let idx = 0; idx < chunks.length; idx++) {
-        output = await generate(chunks[idx],systemMessage, (status: string) => chunkedOutput(status), infinityMode);
+        output = await generate(chunks[idx], systemMessage, (status: string) => chunkedOutput(status), infinityMode);
 
         egoMap = mergeEgosFromJSONStrings([output], egoMap, ". ");
         _onResponse(egoMap);
