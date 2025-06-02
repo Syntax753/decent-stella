@@ -72,6 +72,16 @@
   margin-right: .5vh;
 }
 
+.characterEgoDisplay {
+  color: #666;
+  /* border-top-left-radius: 2vh;
+  border-top-right-radius: 2vh; */
+  font-weight: italic;
+  text-align: left;
+  margin-top: 2vh;
+}
+
+
 .eyes {
   width: 80%;
   margin-bottom: 2vh;

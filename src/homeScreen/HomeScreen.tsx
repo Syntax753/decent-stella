@@ -237,20 +237,20 @@ Do not include characters that do not have a personality.
           )}
 
           {characterEgo && (
-            <input
-              type="text"
-              className={styles.promptBox}
-              placeholder={characterEgo}
-              value={characterPrompt}
-              onChange={(e) => {
-                setCharacterPrompt(e.target.value);
-
-              }}
-            />
+            <>
+              <input
+                type="text"
+                className={styles.promptBox}
+                placeholder="What sayeth?"
+                value={characterPrompt}
+                onChange={(e) => {
+                  setCharacterPrompt(e.target.value);
+                }}
+              />
+              {/* Display characterEgo as text below the input */}
+              <p className={styles.characterEgoDisplay}>{characterEgo}</p>
+            </>
           )}
-
-        {/* Character Output */}
-        {characterResponseText && <p>{characterResponseText}</p>}
 
         {/* Character Input */}
         <p>
