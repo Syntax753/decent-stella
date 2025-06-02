@@ -218,6 +218,7 @@ Do not include characters that do not have a personality.
                 setCharacterResponseText('');
                 setCharacterPrompt('');
                 setCharacterEgo('');
+                setCharactersEgoText('');
 
                 let characterEgo = egoMap.get(selectedCharacter);
                 if (!characterEgo) {
