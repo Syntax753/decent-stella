@@ -151,12 +151,11 @@ Do not include characters that do not have a personality.
       <TopBar />
       <div className={styles.header}><h1>Welcome the Timeless Tavern where the Yarn of Yesteryear is Spun</h1></div>
       <div className={styles.content}>
-        <p>
-          {bardIntroDOM}
-          <br />
-          <ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_PROMPT, BARD_SYSTEM_MESSAGE, _onBardResponse)} />
-        </p>
-
+        
+        {bardIntroDOM}
+        <br />
+        <ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_PROMPT, BARD_SYSTEM_MESSAGE, _onBardResponse)} />
+        <br />
         <br />
         <hr />
         <br />
