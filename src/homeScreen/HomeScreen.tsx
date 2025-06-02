@@ -142,6 +142,22 @@ Do not include characters that do not have a personality.
     }
   }
 
+  // Handler for submitting the character prompt
+  const handleCharacterPromptSubmit = () => {
+    if (!characterPrompt.trim()) { // Prevent submitting empty or whitespace-only prompts
+      console.log("Character prompt is empty. Not submitting.");
+      return;
+    }
+
+    const systemPrompt = `Your name is ${characterSelection} and you are ${characterEgo}.`;
+    console.log("System prompt: ", systemPrompt);
+    console.log("Prompt: ", characterPrompt);
+    submitPrompt(
+      systemPrompt,
+      characterPrompt,
+      _onCharacterResponse
+    );
+  };
   const bardIntroDOM = bardIntroText === GENERATING ? <p>The Bard beckons you to her table<WaitingEllipsis /></p> : <p>{bardIntroText}</p>
   // const charactersEgoDOM = charactersEgoText === GENERATING ? <p>The Bard picks up her lute<WaitingEllipsis /></p> : <p>{charactersEgoText}</p>
   // const character
@@ -246,6 +262,12 @@ Do not include characters that do not have a personality.
                 onChange={(e) => {
                   setCharacterPrompt(e.target.value);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault(); // Prevent default form submission or newline
+                    handleCharacterPromptSubmit();
+                  }
+                }}
               />
               {/* Display characterEgo as text below the input */}
               <p className={styles.characterEgoDisplay}>{characterEgo}</p>
@@ -257,17 +279,7 @@ Do not include characters that do not have a personality.
           {characterPrompt && (
             <ContentButton
               text="Send"
-              onClick={() => {
-                let systemPrompt =
-                  "Your name is " + characterSelection + " and you are " + characterEgo + ".";
-                console.log("System prompt: ", systemPrompt);
-                console.log("Prompt: ", characterPrompt);
-                submitPrompt(
-                  systemPrompt,
-                  characterPrompt,
-                  _onCharacterResponse
-                );
-              }}
+              onClick={handleCharacterPromptSubmit}
             />
           )}
         </p>
