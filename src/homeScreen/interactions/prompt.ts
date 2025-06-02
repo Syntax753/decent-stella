@@ -43,7 +43,7 @@ function delay(ms: number): Promise<void> {
 export async function submitPrompt(prompt: string, systemMessage: string = STELLA_SYSTEM_MESSAGE, _onResponse: Function, infinityMode: boolean = false, _onProgress?: Function) {
 
   let output = '';
-  let current = '';
+  // let current = '';
 
   function chunkedOutput(message: string) {
     output = message;
@@ -94,7 +94,7 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
         await delay(100); // Delay for 100 ms so user input can be proceessed
       }
 
-      current = '';
+      // current = '';
     }
 
   } catch (e) {

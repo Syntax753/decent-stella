@@ -18,14 +18,14 @@ function HomeScreen() {
   const [characterResponseText, setCharacterResponseText] = useState<string>('');
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [charactersEgoText, setCharactersEgoText] = useState<string>('');
+  const [_, setCharactersEgoText] = useState<string>('');
   const [characterEgo, setCharacterEgo] = useState<string>('');
 
   // Data Structs
   const [egoMap, setEgoMap] = useState<Map<string, string>>(new Map<string, string>());
 
   // UX
-  const [modalDialog, setModalDialog] = useState<string | null>(null);
+  // const [modalDialog, setModalDialog] = useState<string | null>(null);
   const [taleSelection, setTaleSelection] = useState<string>('');
   const [characterSelection, setCharacterSelection] = useState<string>('');
   const [characterPrompt, setCharacterPrompt] = useState<string>('');
@@ -81,24 +81,24 @@ Do not include characters that do not have a personality.
 - If a character doesn't have specific details about their personalities, don't include them.
 `
 
-  const EVENTS_SYSTEM_MESSAGE =
-    "You will be given a story and will list each event in that story. " +
-    "Describe every event involving 2 or more people and list those who took part in it. " +
-    "For example " +
-    "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan " +
-    "Do not include an introduction. " +
-    "Do not include any other information. "
+  // const EVENTS_SYSTEM_MESSAGE =
+  //   "You will be given a story and will list each event in that story. " +
+  //   "Describe every event involving 2 or more people and list those who took part in it. " +
+  //   "For example " +
+  //   "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan " +
+  //   "Do not include an introduction. " +
+  //   "Do not include any other information. "
 
-  const CHARACTERS_EVENTS_SYSTEM_MESSAGE =
-    "You will be given a story and will list each character in that story. " +
-    "Please respond with just the name of the character and their attitudes. " +
-    "For example " +
-    "[John]|Very friendly and likes apples [Mary]|Very contrary and likes the sunrise [Paul]|Local blacksmith who enjoys long walks " +
-    "Do not include an introduction. " +
-    "Do not include any other information. " +
-    "Then describe every event involving 2 or more people and list those who took part in it. " +
-    "For example " +
-    "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan"
+  // const CHARACTERS_EVENTS_SYSTEM_MESSAGE =
+  //   "You will be given a story and will list each character in that story. " +
+  //   "Please respond with just the name of the character and their attitudes. " +
+  //   "For example " +
+  //   "[John]|Very friendly and likes apples [Mary]|Very contrary and likes the sunrise [Paul]|Local blacksmith who enjoys long walks " +
+  //   "Do not include an introduction. " +
+  //   "Do not include any other information. " +
+  //   "Then describe every event involving 2 or more people and list those who took part in it. " +
+  //   "For example " +
+  //   "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan"
 
   useEffect(() => {
     if (isLoading) return;
@@ -133,7 +133,7 @@ Do not include characters that do not have a personality.
   function _onProgressBarUpdate(percent: number, task: string = '', remainingFmt: string = '') {
     // console.log('Progress Bar', percent, task, remainingFmt);
     setPercentComplete(percent);
-    // setCurrentTask(task);
+    setCurrentTask(task);
     if (percent === 1) {
       setEstimateComplete('The Bard puts down her Lute, as the Story has Come To Be in The Timeless Tavern...');
     } else {

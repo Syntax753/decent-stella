@@ -1,4 +1,4 @@
-import { isLlmConnected, setSystemMessage } from "@/llm/llmUtil";
+import { isLlmConnected } from "@/llm/llmUtil";
 // import { SYSTEM_MESSAGE } from "./prompt";
 
 export async function init():Promise<boolean> {
