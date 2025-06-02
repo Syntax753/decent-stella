@@ -40,7 +40,7 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function submitPrompt(prompt: string, systemMessage: string = STELLA_SYSTEM_MESSAGE, _onResponse: Function, infinityMode: boolean = false, _onProgress?: Function) {
+export async function submitPrompt(prompt: string, systemMessage: string = STELLA_SYSTEM_MESSAGE, _onResponse: Function, chunkedMode: boolean = false, _onProgress?: Function) {
 
   let output = '';
   // let current = '';
@@ -64,7 +64,7 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
     }
 
     // Single prompt
-    if (!infinityMode) {
+    if (!chunkedMode) {
       console.log("Submitting prompt")
       generate(prompt, systemMessage, (status: string) => _onResponse(status));
     }
@@ -79,7 +79,7 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
 
       let startTime = performance.now();
       for (let idx = 0; idx < chunks.length; idx++) {
-        output = await generate(chunks[idx], systemMessage, (status: string) => chunkedOutput(status), infinityMode);
+        output = await generate(chunks[idx], systemMessage, (status: string) => chunkedOutput(status), chunkedMode);
 
         egoMap = mergeEgosFromJSONStrings([output], egoMap, ". ");
         _onResponse(egoMap);

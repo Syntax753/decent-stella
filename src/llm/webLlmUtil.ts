@@ -50,7 +50,7 @@ export async function webLlmConnect(connection:LLMConnection, onStatusUpdate:Sta
   }
 }
 
-export async function webLlmGenerate(connection:LLMConnection, llmMessages:LLMMessages, prompt:string, onStatusUpdate:StatusUpdateCallback, infinityMode:boolean=false):Promise<string> {
+export async function webLlmGenerate(connection:LLMConnection, llmMessages:LLMMessages, prompt:string, onStatusUpdate:StatusUpdateCallback, chunkedMode:boolean=false):Promise<string> {
   const engine = connection.webLLMEngine;
   if (!engine) throw Error('Unexpected');
 
@@ -64,7 +64,7 @@ export async function webLlmGenerate(connection:LLMConnection, llmMessages:LLMMe
   };
 
 
-  if (!infinityMode) {
+  if (!chunkedMode) {
     addUserMessageToChatHistory(llmMessages, prompt);
   }
 
@@ -79,7 +79,7 @@ export async function webLlmGenerate(connection:LLMConnection, llmMessages:LLMMe
   messageText = await engine.getMessage();
   
   onStatusUpdate(messageText, 1);
-    if (!infinityMode) {
+    if (!chunkedMode) {
     addAssistantMessageToChatHistory(llmMessages, messageText);
   }
   return messageText;

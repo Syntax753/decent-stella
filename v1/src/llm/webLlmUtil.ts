@@ -47,7 +47,7 @@ function _toChatCompletionMessages(llmMessages:LLMMessage[]):ChatCompletionMessa
   });
 }
 
-export async function generateWebLLM(connection:LLMConnection, llmMessages:LLMMessages, prompt:string, onStatusUpdate:StatusUpdateCallback, infinityMode:boolean=false):Promise<string> {
+export async function generateWebLLM(connection:LLMConnection, llmMessages:LLMMessages, prompt:string, onStatusUpdate:StatusUpdateCallback, chunkedMode:boolean=false):Promise<string> {
   const engine = connection.webLLMEngine;
   if (!engine) throw Error('Unexpected');
 
@@ -61,7 +61,7 @@ export async function generateWebLLM(connection:LLMConnection, llmMessages:LLMMe
     temperature: 0.0
   };
 
-  if (!infinityMode) {
+  if (!chunkedMode) {
     addUserMessageToChatHistory(llmMessages, prompt);
   }
   
@@ -76,7 +76,7 @@ export async function generateWebLLM(connection:LLMConnection, llmMessages:LLMMe
   messageText = await engine.getMessage();
   
   onStatusUpdate(messageText, 1);
-  if (!infinityMode) {
+  if (!chunkedMode) {
     addAssistantMessageToChatHistory(llmMessages, messageText);
   }
   return messageText;

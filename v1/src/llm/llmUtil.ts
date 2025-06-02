@@ -66,7 +66,7 @@ export function clearChatHistory() {
   messages.chatHistory = [];
 }
 
-export async function generate(prompt: string, systemMessage: string, onStatusUpdate: StatusUpdateCallback, infinityMode: boolean = false): Promise<string> {
+export async function generate(prompt: string, systemMessage: string, onStatusUpdate: StatusUpdateCallback, chunkedMode: boolean = false): Promise<string> {
 
   if (!isInitialized()) throw Error('LLM connection is not initialized.');
 
@@ -84,7 +84,7 @@ export async function generate(prompt: string, systemMessage: string, onStatusUp
   let message = '';
 
   switch (theConnection.connectionType) {
-    case LLMConnectionType.WEBLLM: message = await generateWebLLM(theConnection, messages, prompt, onStatusUpdate, infinityMode); break;
+    case LLMConnectionType.WEBLLM: message = await generateWebLLM(theConnection, messages, prompt, onStatusUpdate, chunkedMode); break;
     case LLMConnectionType.OLLAMA: message = await generateOllama(theConnection, messages, prompt, onStatusUpdate); break;
     default: throw Error('Unexpected');
   }
