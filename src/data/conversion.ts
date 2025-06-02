@@ -49,6 +49,11 @@ export function mergeEgosFromJSONStrings(
             return;
           }
 
+          if (currentEgo.toUpperCase() == 'NONE') {
+            console.log("Skipping empty ego", character);
+            return;
+          }
+
           // Check if the name already exists in the map
           const existingEgos = egoMap.get(name);
 

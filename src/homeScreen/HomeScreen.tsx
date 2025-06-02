@@ -78,7 +78,7 @@ Do not include characters that do not have a personality.
 - Do not provide an introduction.
 - Only respond with json objects.
 - Check for and correct any syntax errors in the json format.
-- If a character doesn't have specific details about their personalities, don't include them.
+- If a character doesn't have specific details about their personalities, specify their personality as "NONE"
 `
 
   // const EVENTS_SYSTEM_MESSAGE =
