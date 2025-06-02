@@ -49,7 +49,10 @@ npm run dev
 # Dev
 
 1. Add application logic in homescreen/
-1. 
+
+# Deploy to Decent
+
+https://decentapps.net/info/partner-deployment-guide.html
 
 # Contact
 
