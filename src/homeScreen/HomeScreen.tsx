@@ -103,7 +103,7 @@ Do not include characters that do not have a personality.
   useEffect(() => {
     if (isLoading) return;
 
-    init().then(isLlmConnected => { 
+    init().then(isLlmConnected => {
       if (!isLlmConnected) setIsLoading(true);
     });
   }, [isLoading]);
@@ -151,7 +151,7 @@ Do not include characters that do not have a personality.
       <TopBar />
       <div className={styles.header}><h1>Welcome the Timeless Tavern where the Yarn of Yesteryear is Spun</h1></div>
       <div className={styles.content}>
-        
+
         {bardIntroDOM}
         <br />
         <ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_PROMPT, BARD_SYSTEM_MESSAGE, _onBardResponse)} />
@@ -204,7 +204,7 @@ Do not include characters that do not have a personality.
         <br />
         <br />
         {/* Character Select */}
-        <p>
+
           {egoMap.size > 0 && (
 
             <><label htmlFor="characterSelection">The Hall of Heroes</label><br /><br /><select
@@ -247,8 +247,6 @@ Do not include characters that do not have a personality.
             />
           )}
 
-        </p>
-
         {/* Character Input */}
         <p>
           {characterPrompt && (
@@ -270,9 +268,7 @@ Do not include characters that do not have a personality.
         </p>
 
         {/* Character Output */}
-        <p>
-          {characterResponseText && <p>{characterResponseText}</p>}
-        </p>
+        {characterResponseText && <p>{characterResponseText}</p>}
 
         {/* Progress Bar */}
         <p>
