@@ -223,7 +223,7 @@ function HomeScreen() {
                 }
               }}>
               <option value="">Select your Hero</option>
-              {Array.from(egoMap.keys()).map(name => (
+              {Array.from(egoMap.keys()).sort().map(name => (
                 <option key={name} value={name}>{name}</option>))}
             </select></>
           )}
