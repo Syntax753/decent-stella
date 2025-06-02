@@ -254,7 +254,7 @@ Do not include characters that do not have a personality.
               text="Send"
               onClick={() => {
                 let systemPrompt =
-                  "Your name is " + characterSelection + " and you are an adventurer. You should answer any questions with this personality: " + characterEgo + ".";
+                  "Your name is " + characterSelection + " and you are " + characterEgo + ".";
                 console.log("System prompt: ", systemPrompt);
                 console.log("Prompt: ", characterPrompt);
                 submitPrompt(
