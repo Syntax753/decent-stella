@@ -36,10 +36,10 @@ Do not include characters that do not have a personality.
 {"name":"Beethro","ego":"Enjoys exploring dangerous rooms"}
 {"name":"Halp","ego":"Causes trouble whereever he goes - but is helpful too"}
 
+- If a character doesn't have specific details about their personalities, specify their personality as "NONE"
 - Do not provide an introduction.
 - Only respond with json objects.
 - Check for and correct any syntax errors in the json format.
-- If a character doesn't have specific details about their personalities, specify their personality as "NONE"
 `
 
 const ACTORS_SYSTEM_MESSAGE = `
@@ -64,18 +64,28 @@ Name all the active characters in this scene as json.
 `
 
 const EVENTS_SYSTEM_MESSAGE = `
-Name the primary event in this scene.
+For each character in this scene, output the the primary event in this scene and the character.
+
+The output should be in Json.
+
+--
 
 - Example 1:
-{"location: "The Maze"}
+{"event: "The Maze", "character": "The Minotaur"}
+{"event: "The Maze", "character": "Icarus"}
 
 - Example 2:
-{"location: "The Wall"}
+{"event: "The Wall", "character": "Mary"}
+{"event: "The Wall", "character": "Humpty"}
 
 - Example 3:
-{"location: "Dungeon"}
+{"event: "Dungeon", "character": "Beethro"}
+{"event: "Dungeon", "character": "Halp"}
 
 - If you can't identify an event, specify the event as "NONE"
+- Do not provide an introduction.
+- Only respond with json objects.
+- Check for and correct any syntax errors in the json format.
 `
 
 
