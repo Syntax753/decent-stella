@@ -249,6 +249,9 @@ Do not include characters that do not have a personality.
             />
           )}
 
+        {/* Character Output */}
+        {characterResponseText && <p>{characterResponseText}</p>}
+
         {/* Character Input */}
         <p>
           {characterPrompt && (
@@ -276,11 +279,18 @@ Do not include characters that do not have a personality.
           <br />
           <br />
           {currentTask && (
-
             <div className={styles.progressBarContainer}>
-              {currentTask} {(percentComplete * 100).toFixed(1)}%<WaitingEllipsis />
-              <ProgressBar percentComplete={percentComplete} />
-              {estimateComplete}
+              {percentComplete < 1 ? (
+                <>
+                  {currentTask} {(percentComplete * 100).toFixed(1)}%
+                  <WaitingEllipsis />
+                  <ProgressBar percentComplete={percentComplete} />
+                  {estimateComplete}{" "}
+                  {/* This will be the remaining time estimate during progress */}
+                </>
+              ) : (
+                estimateComplete // This will be the completion message when percentComplete is 1
+              )}
             </div>
           )}
 
