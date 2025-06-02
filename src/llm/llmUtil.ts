@@ -77,7 +77,7 @@ export function clearChatHistory() {
   messages.chatHistory = [];
 }
 
-export async function generate(prompt:string, systemMessage: string, onStatusUpdate:StatusUpdateCallback, chunkedMode: boolean = false, clearChat: boolean = true):Promise<string> {
+export async function generate(systemPrompt: string, prompt:string, onStatusUpdate:StatusUpdateCallback, chunkedMode: boolean = false, clearChat: boolean = true):Promise<string> {
   // const cachedResponse = getCachedPromptResponse(prompt); // If your app doesn't benefit from cached responses, just delete this block below.
   // if (cachedResponse) {
   //   onStatusUpdate(cachedResponse, 100);
@@ -96,7 +96,7 @@ export async function generate(prompt:string, systemMessage: string, onStatusUpd
 
   if (clearChat) clearChatHistory();
 
-  setSystemMessage(systemMessage);
+  setSystemMessage(systemPrompt);
 
   theConnection.state = LLMConnectionState.GENERATING;
   let message = '';

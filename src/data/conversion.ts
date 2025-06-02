@@ -29,7 +29,7 @@ export function mergeEgosFromJSONStrings(
     try {
       // Parse the string into an array of objects
       // We assert the type here after parsing. Be sure the input format matches.
-      const characters: CharacterEgo[] = JSON.parse(jsonString);
+      const characters: CharacterEgo[] = JSON.parse(jsonString.trim());
 
       // Check if the parsed result is actually an array (robustness)
       if (!Array.isArray(characters)) {
@@ -50,7 +50,7 @@ export function mergeEgosFromJSONStrings(
           }
 
           if (currentEgo.toUpperCase() == 'NONE') {
-            console.log("Skipping empty ego", character);
+            // console.log("Skipping empty ego", character);
             return;
           }
 

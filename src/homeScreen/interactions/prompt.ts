@@ -42,6 +42,43 @@ Do not include characters that do not have a personality.
 - If a character doesn't have specific details about their personalities, specify their personality as "NONE"
 `
 
+const ACTORS_SYSTEM_MESSAGE = `
+Name all the active characters in this scene as json.
+
+- Example 1:
+
+{"name":"The Minotaur"}
+{"name":"Icarus"}
+
+- Example 2:
+
+{"name":"Mary"}
+{"name":"Humpty"}
+
+- Example 3:
+
+{"name":"Beethro"}
+{"name":"Halp"}
+
+- If there are no characters mentioned, specify 
+`
+
+const EVENTS_SYSTEM_MESSAGE = `
+Name the primary event in this scene.
+
+- Example 1:
+{"location: "The Maze"}
+
+- Example 2:
+{"location: "The Wall"}
+
+- Example 3:
+{"location: "Dungeon"}
+
+- If you can't identify an event, specify the event as "NONE"
+`
+
+
 export const GENERATING = '...';
 
 function chunkString(str: string, chunkSize: number) {
@@ -72,11 +109,12 @@ function delay(ms: number): Promise<void> {
 
 export async function submitPrompt(systemPrompt: string = '', prompt: string, _onResponse: Function, chunkedMode: boolean = false, _onProgress?: Function) {
 
-  let output = '';
-  // let current = '';
+  let egos = '';
+  let events = '';
+  let actors = '';
 
   function chunkedOutput(message: string) {
-    output = message;
+    egos = message;
   }
 
   setSystemMessage(systemPrompt);
@@ -96,7 +134,7 @@ export async function submitPrompt(systemPrompt: string = '', prompt: string, _o
     // Single prompt
     if (!chunkedMode) {
       console.log("Submitting prompt")
-      generate(prompt, systemPrompt, (status: string) => _onResponse(status));
+      generate(systemPrompt, prompt, (status: string) => _onResponse(status));
     }
     // Multiple prompts
     else {
@@ -104,16 +142,24 @@ export async function submitPrompt(systemPrompt: string = '', prompt: string, _o
 
       let task = '';
       let egoMap = new Map<string, string>();
+      let eventMap = new Map<string, Set<string>>();
 
       const chunks = chunkString(prompt, MAX_CHARS);
 
       let startTime = performance.now();
       for (let idx = 0; idx < chunks.length; idx++) {
-        output = await generate(chunks[idx], CHARACTERS_SYSTEM_MESSAGE, (status: string) => chunkedOutput(status), chunkedMode);
+        // Get character perspective
+        egos = await generate(CHARACTERS_SYSTEM_MESSAGE, chunks[idx], (status: string) => chunkedOutput(status), chunkedMode);
 
-        egoMap = mergeEgosFromJSONStrings([output], egoMap, ". ");
+        egoMap = mergeEgosFromJSONStrings([egos], egoMap, ". ");
         _onResponse(egoMap);
 
+        // Get events
+        events = await generate(EVENTS_SYSTEM_MESSAGE, chunks[idx], (status: string) => chunkedOutput(status), chunkedMode, false);
+        console.log("Events", events);
+
+
+        // Update bar
         let percent = (idx + 1) / chunks.length;
 
         let endTime = performance.now();
