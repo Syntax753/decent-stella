@@ -182,6 +182,8 @@ Do not include characters that do not have a personality.
             } else {
               egoMap.clear();
               setTaleSelection(selectedTale);
+              setPercentComplete(0.0);
+              setEstimateComplete('');
               const taleFileName = taleMap[selectedTale];
               if (taleFileName) {
                 fetch(`/tales/${taleFileName}`)
