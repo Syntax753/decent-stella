@@ -77,7 +77,7 @@ export function clearChatHistory() {
   messages.chatHistory = [];
 }
 
-export async function generate(prompt:string, systemMessage: string, onStatusUpdate:StatusUpdateCallback, chunkedMode: boolean = false):Promise<string> {
+export async function generate(prompt:string, systemMessage: string, onStatusUpdate:StatusUpdateCallback, chunkedMode: boolean = false, clearChat: boolean = true):Promise<string> {
   // const cachedResponse = getCachedPromptResponse(prompt); // If your app doesn't benefit from cached responses, just delete this block below.
   // if (cachedResponse) {
   //   onStatusUpdate(cachedResponse, 100);
@@ -94,7 +94,8 @@ export async function generate(prompt:string, systemMessage: string, onStatusUpd
   if (!isLlmConnected()) throw Error('LLM connection is not initialized.');
   if (theConnection.state !== LLMConnectionState.READY) throw Error('LLM is not in ready state.');
 
-  clearChatHistory();
+  if (clearChat) clearChatHistory();
+
   setSystemMessage(systemMessage);
 
   theConnection.state = LLMConnectionState.GENERATING;
@@ -103,7 +104,7 @@ export async function generate(prompt:string, systemMessage: string, onStatusUpd
     case LLMConnectionType.WEBLLM: message = await webLlmGenerate(theConnection, messages, prompt, onStatusUpdate, chunkedMode); break;
     default: throw Error('Unexpected');
   }
-  setCachedPromptResponse(prompt, message);
+  // setCachedPromptResponse(prompt, message);
   theConnection.state = LLMConnectionState.READY;
   return message;
 }

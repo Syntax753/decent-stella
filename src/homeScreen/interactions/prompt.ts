@@ -12,6 +12,36 @@ Your want is to entertain the audience with your story.
 Talk about yourself as though you are observing the scene.
 `
 
+const CHARACTERS_SYSTEM_MESSAGE = `
+Name all the characters in the story along with their personality.
+Do not include characters that do not have a personality.
+
+1. Collect the character and personality from the story and populate the json.
+2. The fields in the json are
+  - Name: This is the character's name
+  - Ego: This is the character's personality
+
+- Example 1:
+
+{"name":"The Minotaur","ego":"Very friendly and likes apples"}
+{"name":"Icarus","ego":"Loves flying and sunny days" }
+
+- Example 2:
+
+{"name":"Mary","ego":"Quite contrary and loves silver bells"}
+{"name":"Humpty","ego":"Loves eating omelettes"}
+
+- Example 3:
+
+{"name":"Beethro","ego":"Enjoys exploring dangerous rooms"}
+{"name":"Halp","ego":"Causes trouble whereever he goes - but is helpful too"}
+
+- Do not provide an introduction.
+- Only respond with json objects.
+- Check for and correct any syntax errors in the json format.
+- If a character doesn't have specific details about their personalities, specify their personality as "NONE"
+`
+
 export const GENERATING = '...';
 
 function chunkString(str: string, chunkSize: number) {
@@ -40,7 +70,7 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function submitPrompt(prompt: string, systemMessage: string = STELLA_SYSTEM_MESSAGE, _onResponse: Function, chunkedMode: boolean = false, _onProgress?: Function) {
+export async function submitPrompt(systemPrompt: string = '', prompt: string, _onResponse: Function, chunkedMode: boolean = false, _onProgress?: Function) {
 
   let output = '';
   // let current = '';
@@ -49,7 +79,7 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
     output = message;
   }
 
-  setSystemMessage(systemMessage);
+  setSystemMessage(systemPrompt);
   _onResponse(GENERATING);
 
   try {
@@ -66,7 +96,7 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
     // Single prompt
     if (!chunkedMode) {
       console.log("Submitting prompt")
-      generate(prompt, systemMessage, (status: string) => _onResponse(status));
+      generate(prompt, systemPrompt, (status: string) => _onResponse(status));
     }
     // Multiple prompts
     else {
@@ -79,7 +109,7 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
 
       let startTime = performance.now();
       for (let idx = 0; idx < chunks.length; idx++) {
-        output = await generate(chunks[idx], systemMessage, (status: string) => chunkedOutput(status), chunkedMode);
+        output = await generate(chunks[idx], CHARACTERS_SYSTEM_MESSAGE, (status: string) => chunkedOutput(status), chunkedMode);
 
         egoMap = mergeEgosFromJSONStrings([output], egoMap, ". ");
         _onResponse(egoMap);

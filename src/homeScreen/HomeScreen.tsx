@@ -42,7 +42,7 @@ function HomeScreen() {
     "the-raven": "the-raven.txt",
   };
 
-  const BARD_SYSTEM_MESSAGE = "You love telling stories. " +
+  const BARD_SYSTEM_PROMPT = "You love telling stories. " +
     "You are carrying a lute and are sitting in the Timeless Tavern. " +
     "An adventurer enters the tavern and sits at a nearby table."
 
@@ -51,37 +51,7 @@ function HomeScreen() {
     "Invite the traveller to your table " +
     "Format the output using markdown. "
 
-  const CHARACTERS_SYSTEM_MESSAGE = `
-Name all the characters in the story along with their personality.
-Do not include characters that do not have a personality.
-
-1. Collect the character and personality from the story and populate the json.
-2. The fields in the json are
-  - Name: This is the character's name
-  - Ego: This is the character's personality
-
-- Example 1:
-
-{"name":"The Minotaur","ego":"Very friendly and likes apples"}
-{"name":"Icarus","ego":"Loves flying and sunny days" }
-
-- Example 2:
-
-{"name":"Mary","ego":"Quite contrary and loves silver bells"}
-{"name":"Humpty","ego":"Loves eating omelettes"}
-
-- Example 3:
-
-{"name":"Beethro","ego":"Enjoys exploring dangerous rooms"}
-{"name":"Halp","ego":"Causes trouble whereever he goes - but is helpful too"}
-
-- Do not provide an introduction.
-- Only respond with json objects.
-- Check for and correct any syntax errors in the json format.
-- If a character doesn't have specific details about their personalities, specify their personality as "NONE"
-`
-
-  // const EVENTS_SYSTEM_MESSAGE =
+    // const EVENTS_SYSTEM_MESSAGE =
   //   "You will be given a story and will list each event in that story. " +
   //   "Describe every event involving 2 or more people and list those who took part in it. " +
   //   "For example " +
@@ -170,7 +140,7 @@ Do not include characters that do not have a personality.
 
         {bardIntroDOM}
         <br />
-        <ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_PROMPT, BARD_SYSTEM_MESSAGE, _onBardResponse)} />
+        <ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_SYSTEM_PROMPT, BARD_PROMPT, _onBardResponse)} />
         <br />
         <br />
         <hr />
@@ -200,12 +170,18 @@ Do not include characters that do not have a personality.
               setTaleSelection(selectedTale);
               setPercentComplete(0.0);
               setEstimateComplete('');
+
+              setCharacterResponseText('');
+              setCharacterPrompt('');
+              setCharacterEgo('');
+              setCharactersEgoText('');   
+                         
               const taleFileName = taleMap[selectedTale];
               if (taleFileName) {
                 fetch(`/tales/${taleFileName}`)
                   .then(response => response.text())
                   .then((taleContent) => {
-                    submitPrompt(taleContent, CHARACTERS_SYSTEM_MESSAGE, _onCharactersEgoResponse, true, _onProgressBarUpdate);
+                    submitPrompt('', taleContent, _onCharactersEgoResponse, true, _onProgressBarUpdate);
                   })
                   .catch(error => console.error('Error loading tale:', error));
               }
