@@ -1,4 +1,4 @@
-# decent-stella
+# STella
 Decent Story Teller App
 
 # Preflight
