@@ -130,10 +130,10 @@ Do not include characters that do not have a personality.
     setCharacterResponseText(text);
   }
 
-  function _onProgressBarUpdate(percent: number, task: string = '', remainingFmt: string = '') {
+  function _onProgressBarUpdate(percent: number, remainingFmt: string = '') {
     // console.log('Progress Bar', percent, task, remainingFmt);
     setPercentComplete(percent);
-    setCurrentTask(task);
+    // setCurrentTask(task);
     if (percent === 1) {
       setEstimateComplete('The Bard puts down her Lute, as the Story has Come To Be in The Timeless Tavern...');
     } else {
@@ -271,7 +271,6 @@ Do not include characters that do not have a personality.
         {characterResponseText && <p>{characterResponseText}</p>}
 
         {/* Progress Bar */}
-        <p>
           <br />
           <br />
           {currentTask && (
@@ -282,12 +281,10 @@ Do not include characters that do not have a personality.
               {estimateComplete}
             </div>
           )}
-        </p>
 
       </div>
 
       <br />
-      {/* <LLMDevPauseDialog isOpen={modalDialog === LLMDevPauseDialog.name} onConfirm={() => setLocation(LOAD_URL)} onCancel={() => setModalDialog(null)} /> */}
     </div>
   );
 }
