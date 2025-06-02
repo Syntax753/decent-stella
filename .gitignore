@@ -14,7 +14,6 @@ dist-ssr
 workAssets
 coverage
 public/.vite
-.github/workflows/*.yml
 ERIK.md
 
 # Editor directories and files
