@@ -78,11 +78,18 @@ export function clearChatHistory() {
 }
 
 export async function generate(prompt:string, systemMessage: string, onStatusUpdate:StatusUpdateCallback, infinityMode: boolean = false):Promise<string> {
-  const cachedResponse = getCachedPromptResponse(prompt); // If your app doesn't benefit from cached responses, just delete this block below.
-  if (cachedResponse) {
-    onStatusUpdate(cachedResponse, 100);
-    return cachedResponse;
-  }
+  // const cachedResponse = getCachedPromptResponse(prompt); // If your app doesn't benefit from cached responses, just delete this block below.
+  // if (cachedResponse) {
+  //   onStatusUpdate(cachedResponse, 100);
+  //   return cachedResponse;
+  // }
+
+  
+  // console.info('system', systemMessage);
+  // console.info('prompt', prompt)
+
+  // Wait for the LLM to be in the READY state
+  await waitForLLMReady();
 
   if (!isLlmConnected()) throw Error('LLM connection is not initialized.');
   if (theConnection.state !== LLMConnectionState.READY) throw Error('LLM is not in ready state.');
@@ -99,4 +106,27 @@ export async function generate(prompt:string, systemMessage: string, onStatusUpd
   setCachedPromptResponse(prompt, message);
   theConnection.state = LLMConnectionState.READY;
   return message;
+}
+
+async function waitForLLMReady(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (theConnection.state === LLMConnectionState.READY) {
+      resolve();
+      return;
+    }
+
+    const checkInterval = setInterval(() => {
+      if (theConnection.state === LLMConnectionState.READY) {
+        clearInterval(checkInterval);
+        resolve();
+      }
+    }, 50); // Check every 50 milliseconds (adjust as needed)
+
+    // Optional: Add a timeout to prevent indefinite waiting
+    setTimeout(() => {
+      clearInterval(checkInterval);
+      console.error('Timeout waiting for LLM to be ready.');
+      reject(new Error('Timeout waiting for LLM to be ready.'));
+    }, 100000); // Wait for 100 seconds
+  });
 }

@@ -65,10 +65,12 @@ export async function submitPrompt(prompt: string, systemMessage: string = STELL
 
     // Single prompt
     if (!infinityMode) {
+      console.log("Submitting prompt")
       generate(prompt, systemMessage, (status: string) => _onResponse(status));
     }
     // Multiple prompts
     else {
+      console.log("Chunking prompt")
 
       let task = '';
       let egoMap = new Map<string, string>();
