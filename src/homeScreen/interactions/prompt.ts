@@ -40,6 +40,7 @@ Name all the characters in the story along with their personality.
 
 const EVENTS_SYSTEM_MESSAGE = `
 Idenfity the the primary event in this scene and all the characters present and return an array of json objects.
+There should only be one event per scene.
 
 1. Collect the primary event and the name of a character from the story and populate the json array.
 2. The fields in the json are

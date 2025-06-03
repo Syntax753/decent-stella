@@ -29,7 +29,9 @@ function HomeScreen() {
   // const [modalDialog, setModalDialog] = useState<string | null>(null);
   const [taleSelection, setTaleSelection] = useState<string>('');
   const [characterSelection, setCharacterSelection] = useState<string>('');
+  const [eventSelection, setEventSelection] = useState<string>('');
   const [characterPrompt, setCharacterPrompt] = useState<string>('');
+  const [eventPrompt, setEventPrompt] = useState<string>('');
 
   // Progress bar
   const [percentComplete, setPercentComplete] = useState<number>(0.0);
@@ -52,7 +54,7 @@ function HomeScreen() {
     "Invite the traveller to your table " +
     "Format the output using markdown. "
 
-    // const EVENTS_SYSTEM_MESSAGE =
+  // const EVENTS_SYSTEM_MESSAGE =
   //   "You will be given a story and will list each event in that story. " +
   //   "Describe every event involving 2 or more people and list those who took part in it. " +
   //   "For example " +
@@ -130,6 +132,25 @@ function HomeScreen() {
       _onCharacterResponse
     );
   };
+
+  // Handler for submitting the character prompt
+  const handleEventPromptSubmit = () => {
+    if (!eventPrompt.trim()) { // Prevent submitting empty or whitespace-only prompts
+      console.log("Event prompt is empty. Not submitting.");
+      return;
+    }
+
+    const systemPrompt = `Your name is ${characterSelection} and you are ${characterEgo}. The event to discuss in particular is ${eventSelection}.`;
+    console.log("System prompt: ", systemPrompt);
+    console.log("Prompt: ", eventPrompt); // Corrected to use eventPrompt
+    submitPrompt(
+      systemPrompt,
+      eventPrompt, // Corrected to use eventPrompt
+      _onCharacterResponse
+    );
+  };
+
+
   const bardIntroDOM = bardIntroText === GENERATING ? <p>The Bard beckons you to her table<WaitingEllipsis /></p> : <p>{bardIntroText}</p>
   // const charactersEgoDOM = charactersEgoText === GENERATING ? <p>The Bard picks up her lute<WaitingEllipsis /></p> : <p>{charactersEgoText}</p>
   // const character
@@ -178,8 +199,8 @@ function HomeScreen() {
               setCharacterResponseText('');
               setCharacterPrompt('');
               setCharacterEgo('');
-              setCharactersEgoText('');   
-                         
+              setCharactersEgoText('');
+
               const taleFileName = taleMap[selectedTale];
               if (taleFileName) {
                 fetch(`/tales/${taleFileName}`)
@@ -203,56 +224,87 @@ function HomeScreen() {
         <br />
         {/* Character Select */}
 
-          {egoMap.size > 0 && (
+        {/* Select hero */}
+        {egoMap.size > 0 && (
 
-            <><label htmlFor="characterSelection">The Hall of Heroes</label><br /><br /><select
-              id="characterSelection"
-              value={characterSelection}
+          <><label htmlFor="characterSelection">The Hall of Heroes</label><br /><br /><select
+            id="characterSelection"
+            value={characterSelection}
+            onChange={(e) => {
+              const selectedCharacter = e.target.value;
+              setCharacterSelection(selectedCharacter);
+
+              // Reset - move to separate reset function call perhaps
+              setCharacterResponseText('');
+              setCharacterPrompt('');
+              setCharacterEgo('');
+              setEventSelection(''); // Reset event selection
+              setEventPrompt('');    // Reset event prompt
+
+              let characterEgo = egoMap.get(selectedCharacter);
+              if (!characterEgo) {
+                console.error('Missing ego', selectedCharacter);
+              } else {
+
+                setCharacterEgo(characterEgo);
+              }
+            }}>
+            <option value="">Select your Hero</option>
+            {Array.from(egoMap.keys()).sort().map(name => (
+              <option key={name} value={name}>{name}</option>))}
+          </select></>
+        )}
+
+        <br />
+        <br />
+
+        {/* Select event */}
+        {characterSelection && eventMap.get(characterSelection) && (
+
+          <><label htmlFor="eventSelection">Events Unfold..</label><br /><br /><select
+            id="eventSelection"
+            value={eventSelection}
+            onChange={(e) => {
+              const selectedEvent = e.target.value;
+              setEventSelection(selectedEvent);
+            }}>
+            <option value="">Select your Event</option>
+            {
+              // Get the Set of events for the selected character.
+              // The outer condition (characterSelection && eventMap.get(characterSelection))
+              // ensures eventsForCharacter is a Set<string> here.
+              // '!' asserts it's not undefined
+              Array.from(eventMap.get(characterSelection)!)
+                .sort() // Sorts the event strings alphabetically
+                .map(event => (<option key={event} value={event}>{event}</option>))}
+          </select></>
+        )}
+        
+        <br />
+        <br />
+
+        {characterEgo && (
+          <>
+            <input
+              type="text"
+              className={styles.promptBox}
+              placeholder="What sayeth?"
+              value={characterPrompt}
               onChange={(e) => {
-                const selectedCharacter = e.target.value;
-                setCharacterSelection(selectedCharacter);
-
-                // Reset
-                setCharacterResponseText('');
-                setCharacterPrompt('');
-                setCharacterEgo('');
-                setCharactersEgoText('');
-
-                let characterEgo = egoMap.get(selectedCharacter);
-                if (!characterEgo) {
-                  console.error('Missing ego', selectedCharacter);
-                } else {
-
-                  setCharacterEgo(characterEgo);
+                setCharacterPrompt(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault(); // Prevent default form submission or newline
+                  handleCharacterPromptSubmit();
                 }
-              }}>
-              <option value="">Select your Hero</option>
-              {Array.from(egoMap.keys()).sort().map(name => (
-                <option key={name} value={name}>{name}</option>))}
-            </select></>
-          )}
+              }}
+            />
+            {/* Display characterEgo as text below the input */}
+            <p className={styles.characterEgoDisplay}>{characterEgo}</p>
+          </>
+        )}
 
-          {characterEgo && (
-            <>
-              <input
-                type="text"
-                className={styles.promptBox}
-                placeholder="What sayeth?"
-                value={characterPrompt}
-                onChange={(e) => {
-                  setCharacterPrompt(e.target.value);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault(); // Prevent default form submission or newline
-                    handleCharacterPromptSubmit();
-                  }
-                }}
-              />
-              {/* Display characterEgo as text below the input */}
-              <p className={styles.characterEgoDisplay}>{characterEgo}</p>
-            </>
-          )}
 
         {/* Character Input */}
         <p>
@@ -268,23 +320,23 @@ function HomeScreen() {
         {characterResponseText && <p>{characterResponseText}</p>}
 
         {/* Progress Bar */}
-          <br />
-          <br />
-          {currentTask && (
-            <div className={styles.progressBarContainer}>
-              {percentComplete < 1 ? (
-                <>
-                  {currentTask} {(percentComplete * 100).toFixed(1)}%
-                  <WaitingEllipsis />
-                  <ProgressBar percentComplete={percentComplete} />
-                  {estimateComplete}{" "}
-                  {/* This will be the remaining time estimate during progress */}
-                </>
-              ) : (
-                estimateComplete // This will be the completion message when percentComplete is 1
-              )}
-            </div>
-          )}
+        <br />
+        <br />
+        {currentTask && (
+          <div className={styles.progressBarContainer}>
+            {percentComplete < 1 ? (
+              <>
+                {currentTask} {(percentComplete * 100).toFixed(1)}%
+                <WaitingEllipsis />
+                <ProgressBar percentComplete={percentComplete} />
+                {estimateComplete}{" "}
+                {/* This will be the remaining time estimate during progress */}
+              </>
+            ) : (
+              estimateComplete // This will be the completion message when percentComplete is 1
+            )}
+          </div>
+        )}
 
       </div>
 
