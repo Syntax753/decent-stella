@@ -1,3 +1,4 @@
+// import { Environment } from "@mlc-ai/web-runtime/lib/environment";
 
 interface CharacterEgo {
   name: string;
@@ -72,7 +73,7 @@ export function mergeEventsFromJSONStrings(
           eventMap.set(character, new Set<string>().add(eventName));
         }
       } else {
-        console.warn(`Skipping invalid object format within string index ${index}:`, event);
+        console.warn(`Skipping invalid object format`, event);
       }
     });
 
@@ -135,7 +136,7 @@ export function mergeEgosFromJSONStrings(
           egoMap.set(name, currentEgo);
         }
       } else {
-        console.warn(`Skipping invalid object format within string index ${index}:`, character);
+        console.warn(`Skipping invalid object format`, character);
       }
     });
 

@@ -16,7 +16,7 @@ import LLMConnectionType from "./types/LLMConnectionType";
 import LLMMessages from "./types/LLMMessages";
 import StatusUpdateCallback from "./types/StatusUpdateCallback";
 import { webLlmConnect, webLlmGenerate } from "./webLlmUtil";
-import { getCachedPromptResponse, setCachedPromptResponse } from "./promptCache";
+// import { getCachedPromptResponse, setCachedPromptResponse } from "./promptCache";
 
 let theConnection:LLMConnection = {
   state:LLMConnectionState.UNINITIALIZED,

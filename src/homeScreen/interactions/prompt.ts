@@ -90,10 +90,7 @@ function delay(ms: number): Promise<void> {
 
 export async function submitPrompt(systemPrompt: string = '', prompt: string, _onResponse: Function, chunkedMode: boolean = false, _onProgress?: Function) {
 
-  let egos = '';
-
-  function chunkedOutput(message: string) {
-    egos = message;
+  function chunkedOutput(_: string) {
   }
 
   setSystemMessage(systemPrompt);
