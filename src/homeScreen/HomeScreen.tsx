@@ -23,6 +23,7 @@ function HomeScreen() {
 
   // Data Structs
   const [egoMap, setEgoMap] = useState<Map<string, string>>(new Map<string, string>());
+  const [eventMap, setEventMap] = useState<Map<string, Set<string>>>(new Map<string, Set<string>>());
 
   // UX
   // const [modalDialog, setModalDialog] = useState<string | null>(null);
@@ -86,12 +87,13 @@ function HomeScreen() {
   }
 
   // Data Structure updates
-  function _onCharactersEgoResponse(ego: string | Map<string, string>) {
-    if (typeof ego === 'string') {
-      setCharactersEgoText(ego);
+  function _onCharactersEgoResponse(egoMap: string | Map<string, string>, eventMap: Map<string, Set<string>>) {
+    if (typeof egoMap === 'string') {
+      setCharactersEgoText(egoMap);
     } else {
-      setEgoMap(ego);
-      setCharactersEgoText(formatMapToString(ego));
+      setEgoMap(egoMap);
+      setEventMap(eventMap);
+      setCharactersEgoText(formatMapToString(egoMap));
     }
   }
 
@@ -167,6 +169,8 @@ function HomeScreen() {
               setCharactersEgoText('');
             } else {
               egoMap.clear();
+              eventMap.clear();
+
               setTaleSelection(selectedTale);
               setPercentComplete(0.0);
               setEstimateComplete('');

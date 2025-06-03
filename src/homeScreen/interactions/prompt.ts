@@ -1,6 +1,7 @@
 import { isServingLocally } from "@/developer/devEnvUtil";
 import { generate, isLlmConnected, setSystemMessage } from "@/llm/llmUtil";
 import { mergeEgosFromJSONStrings } from "@/data/conversion";
+import { mergeEventsFromJSONStrings } from "@/data/conversion";
 
 const MAX_CHARS: number = 500;
 
@@ -14,80 +15,50 @@ Talk about yourself as though you are observing the scene.
 
 const CHARACTERS_SYSTEM_MESSAGE = `
 Name all the characters in the story along with their personality.
-Do not include characters that do not have a personality.
 
-1. Collect the character and personality from the story and populate the json.
+1. Collect the character and personality from the story and return an array of json objects.
 2. The fields in the json are
   - Name: This is the character's name
   - Ego: This is the character's personality
 
 - Example 1:
 
-{"name":"The Minotaur","ego":"Very friendly and likes apples"}
-{"name":"Icarus","ego":"Loves flying and sunny days" }
+[{"name":"The Minotaur","ego":"Very friendly and likes apples"},{"name":"Icarus","ego":"Loves flying and sunny days"}]
 
 - Example 2:
 
-{"name":"Mary","ego":"Quite contrary and loves silver bells"}
-{"name":"Humpty","ego":"Loves eating omelettes"}
+[{"name":"Mary","ego":"Quite contrary and loves silver bells"},{"name":"Humpty","ego":"Loves eating omelettes"}]
 
 - Example 3:
 
-{"name":"Beethro","ego":"Enjoys exploring dangerous rooms"}
-{"name":"Halp","ego":"Causes trouble whereever he goes - but is helpful too"}
+[{"name":"Beethro","ego":"Enjoys exploring dangerous rooms"},{"name":"Halph","ego":"Causes trouble whereever he goes - but is helpful too"}]
 
 - If a character doesn't have specific details about their personalities, specify their personality as "NONE"
+- Do not use these examples in the output
 - Do not provide an introduction.
-- Only respond with json objects.
-- Check for and correct any syntax errors in the json format.
-`
-
-const ACTORS_SYSTEM_MESSAGE = `
-Name all the active characters in this scene as json.
-
-- Example 1:
-
-{"name":"The Minotaur"}
-{"name":"Icarus"}
-
-- Example 2:
-
-{"name":"Mary"}
-{"name":"Humpty"}
-
-- Example 3:
-
-{"name":"Beethro"}
-{"name":"Halp"}
-
-- If there are no characters mentioned, specify 
 `
 
 const EVENTS_SYSTEM_MESSAGE = `
-For each character in this scene, output the the primary event in this scene and the character.
+Idenfity the the primary event in this scene and all the characters present and return an array of json objects.
 
-The output should be in Json.
-
---
+1. Collect the primary event and the name of a character from the story and populate the json array.
+2. The fields in the json are
+  - event: This is the name of the event
+  - character: This is the name of a character present
 
 - Example 1:
-{"event: "The Maze", "character": "The Minotaur"}
-{"event: "The Maze", "character": "Icarus"}
+[{"event":"The Maze","character":"The Minotaur"},{"event":"The Maze","character":"Icarus"}]
 
 - Example 2:
-{"event: "The Wall", "character": "Mary"}
-{"event: "The Wall", "character": "Humpty"}
+[{"event":"The Wall","character":"Mary"},{"event":"The Wall","character":"Humpty"}]
 
 - Example 3:
-{"event: "Dungeon", "character": "Beethro"}
-{"event: "Dungeon", "character": "Halp"}
+[{"event:"Dungeon","character":"Beethro"},{"event:"Dungeon","character":"Halph"}]
 
-- If you can't identify an event, specify the event as "NONE"
+- If you can't identify a primary event, specify the event as "NONE"
+- Do not use these examples in the output
 - Do not provide an introduction.
-- Only respond with json objects.
-- Check for and correct any syntax errors in the json format.
 `
-
 
 export const GENERATING = '...';
 
@@ -120,8 +91,6 @@ function delay(ms: number): Promise<void> {
 export async function submitPrompt(systemPrompt: string = '', prompt: string, _onResponse: Function, chunkedMode: boolean = false, _onProgress?: Function) {
 
   let egos = '';
-  let events = '';
-  let actors = '';
 
   function chunkedOutput(message: string) {
     egos = message;
@@ -159,15 +128,15 @@ export async function submitPrompt(systemPrompt: string = '', prompt: string, _o
       let startTime = performance.now();
       for (let idx = 0; idx < chunks.length; idx++) {
         // Get character perspective
-        egos = await generate(CHARACTERS_SYSTEM_MESSAGE, chunks[idx], (status: string) => chunkedOutput(status), chunkedMode);
-
-        egoMap = mergeEgosFromJSONStrings([egos], egoMap, ". ");
-        _onResponse(egoMap);
+        let egos = await generate(CHARACTERS_SYSTEM_MESSAGE, chunks[idx], (status: string) => chunkedOutput(status), chunkedMode);
+        egoMap = mergeEgosFromJSONStrings(egos, egoMap, ". ");
 
         // Get events
-        events = await generate(EVENTS_SYSTEM_MESSAGE, chunks[idx], (status: string) => chunkedOutput(status), chunkedMode, false);
-        console.log("Events", events);
+        let events = await generate(EVENTS_SYSTEM_MESSAGE, chunks[idx], (status: string) => chunkedOutput(status), chunkedMode, false);
+        eventMap = mergeEventsFromJSONStrings(events, eventMap);
 
+        console.log("Events", eventMap);
+        _onResponse(egoMap, eventMap);
 
         // Update bar
         let percent = (idx + 1) / chunks.length;
