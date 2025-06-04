@@ -31,7 +31,6 @@ function HomeScreen() {
   const [characterSelection, setCharacterSelection] = useState<string>('');
   const [eventSelection, setEventSelection] = useState<string>('');
   const [characterPrompt, setCharacterPrompt] = useState<string>('');
-  const [eventPrompt, setEventPrompt] = useState<string>('');
 
   // Progress bar
   const [percentComplete, setPercentComplete] = useState<number>(0.0);
@@ -134,21 +133,21 @@ function HomeScreen() {
   };
 
   // Handler for submitting the character prompt
-  const handleEventPromptSubmit = () => {
-    if (!eventPrompt.trim()) { // Prevent submitting empty or whitespace-only prompts
-      console.log("Event prompt is empty. Not submitting.");
-      return;
-    }
+  // const handleEventPromptSubmit = () => {
+  //   if (!eventPrompt.trim()) { // Prevent submitting empty or whitespace-only prompts
+  //     console.log("Event prompt is empty. Not submitting.");
+  //     return;
+  //   }
 
-    const systemPrompt = `Your name is ${characterSelection} and you are ${characterEgo}. The event to discuss in particular is ${eventSelection}.`;
-    console.log("System prompt: ", systemPrompt);
-    console.log("Prompt: ", eventPrompt); // Corrected to use eventPrompt
-    submitPrompt(
-      systemPrompt,
-      eventPrompt, // Corrected to use eventPrompt
-      _onCharacterResponse
-    );
-  };
+  //   const systemPrompt = `Your name is ${characterSelection} and you are ${characterEgo}. The event to discuss in particular is ${eventSelection}.`;
+  //   console.log("System prompt: ", systemPrompt);
+  //   console.log("Prompt: ", eventPrompt); // Corrected to use eventPrompt
+  //   submitPrompt(
+  //     systemPrompt,
+  //     eventPrompt, // Corrected to use eventPrompt
+  //     _onCharacterResponse
+  //   );
+  // };
 
 
   const bardIntroDOM = bardIntroText === GENERATING ? <p>The Bard beckons you to her table<WaitingEllipsis /></p> : <p>{bardIntroText}</p>
@@ -239,7 +238,6 @@ function HomeScreen() {
               setCharacterPrompt('');
               setCharacterEgo('');
               setEventSelection(''); // Reset event selection
-              setEventPrompt('');    // Reset event prompt
 
               let characterEgo = egoMap.get(selectedCharacter);
               if (!characterEgo) {
