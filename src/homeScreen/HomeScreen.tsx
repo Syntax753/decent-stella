@@ -202,7 +202,7 @@ function HomeScreen() {
 
               const taleFileName = taleMap[selectedTale];
               if (taleFileName) {
-                fetch(`/tales/${taleFileName}`)
+                fetch(`./tales/${taleFileName}`)
                   .then(response => response.text())
                   .then((taleContent) => {
                     submitPrompt('', taleContent, _onCharactersEgoResponse, true, _onProgressBarUpdate);
