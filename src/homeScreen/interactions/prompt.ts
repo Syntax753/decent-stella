@@ -14,7 +14,7 @@ Talk about yourself as though you are observing the scene.
 `
 
 const CHARACTERS_SYSTEM_MESSAGE = `
-Name all the characters in the story along with their personality.
+Name all the characters in the story and describe their personality.
 
 1. Collect the character and personality from the story and return an array of json objects.
 2. The fields in the json are

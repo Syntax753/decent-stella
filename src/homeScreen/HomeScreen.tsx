@@ -42,6 +42,7 @@ function HomeScreen() {
     "the-famous-five-on-treasure-island": "the-famous-five-on-treasure-island.txt",
     "the-fellowship-of-the-ring": "the-fellowship-of-the-ring.txt",
     "the-raven": "the-raven.txt",
+    "the-king-james-bible": "the-king-james-bible.txt"
   };
 
   const BARD_SYSTEM_PROMPT = "You love telling stories. " +
@@ -132,27 +133,7 @@ function HomeScreen() {
     );
   };
 
-  // Handler for submitting the character prompt
-  // const handleEventPromptSubmit = () => {
-  //   if (!eventPrompt.trim()) { // Prevent submitting empty or whitespace-only prompts
-  //     console.log("Event prompt is empty. Not submitting.");
-  //     return;
-  //   }
-
-  //   const systemPrompt = `Your name is ${characterSelection} and you are ${characterEgo}. The event to discuss in particular is ${eventSelection}.`;
-  //   console.log("System prompt: ", systemPrompt);
-  //   console.log("Prompt: ", eventPrompt); // Corrected to use eventPrompt
-  //   submitPrompt(
-  //     systemPrompt,
-  //     eventPrompt, // Corrected to use eventPrompt
-  //     _onCharacterResponse
-  //   );
-  // };
-
-
   const bardIntroDOM = bardIntroText === GENERATING ? <p>The Bard beckons you to her table<WaitingEllipsis /></p> : <p>{bardIntroText}</p>
-  // const charactersEgoDOM = charactersEgoText === GENERATING ? <p>The Bard picks up her lute<WaitingEllipsis /></p> : <p>{charactersEgoText}</p>
-  // const character
 
   return (
     <div className={styles.container}>
@@ -217,6 +198,7 @@ function HomeScreen() {
           <option value="the-famous-five-on-treasure-island">The Famous Five on Treasure Island (Blyton)</option>
           <option value="the-fellowship-of-the-ring">The Fellowship of the Ring (Tolkien)</option>
           <option value="the-raven">The Raven (Poe)</option>
+          <option value="the-king-james-bible">The King James Bible</option>
         </select>}
 
         <br />
