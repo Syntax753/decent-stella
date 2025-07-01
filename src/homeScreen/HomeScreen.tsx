@@ -42,6 +42,7 @@ function HomeScreen() {
     "the-famous-five-on-treasure-island": "the-famous-five-on-treasure-island.txt",
     "the-fellowship-of-the-ring": "the-fellowship-of-the-ring.txt",
     "the-raven": "the-raven.txt",
+    "the-trial": "the-trial.txt",
     "the-king-james-bible": "the-king-james-bible.txt"
   };
 
@@ -198,6 +199,7 @@ function HomeScreen() {
           <option value="the-famous-five-on-treasure-island">The Famous Five on Treasure Island (Blyton)</option>
           <option value="the-fellowship-of-the-ring">The Fellowship of the Ring (Tolkien)</option>
           <option value="the-raven">The Raven (Poe)</option>
+          <option value="the-trial">The Trial (Kafka)</option>
           <option value="the-king-james-bible">The King James Bible</option>
         </select>}
 
