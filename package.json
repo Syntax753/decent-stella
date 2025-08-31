@@ -17,6 +17,7 @@
     "@mlc-ai/web-llm": "^0.2.75",
     "@mlc-ai/web-runtime": "^0.18.0-dev2",
     "@mlc-ai/web-tokenizers": "^0.1.5",
+    "decent-portal": "^2.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "wouter": "^3.3.5"

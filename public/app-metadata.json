@@ -1,0 +1,8 @@
+{  
+  "id":"decent-stella",  
+  "name":"Stella - a Decent Story Teller",  
+  "description":"Welcome to the timeless Tavern, where the Yarn of Yester-year is Spun",  
+  "supportedModels":[    
+    {"id":"Llama-3.1-8B-Instruct-q4f16_1-MLC-1k","appBehaviorSummary":"2025 Decent default model"} 
+  ]
+}
