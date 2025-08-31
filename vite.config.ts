@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
-    base: env.VITE_BASE_URL || '/',
+    base: env.VITE_BASE_URL || './',
     plugins: [react()],
     css: {
       modules: {
@@ -18,6 +18,10 @@ export default defineConfig(({mode}) => {
     build: { 
       sourcemap: true, 
       manifest: true
+    },
+    test: {
+      environment: 'node',
+      globals: true
     }
   };
 });

@@ -1,4 +1,4 @@
-# decent-stella
+# STella
 Decent Story Teller App
 
 # Preflight
@@ -9,14 +9,6 @@ Google One -> Sign up for **Gemini Advanced** (https://one.google.com/about/ai-p
 * GitHub Setup
 
 Create GitHub repo (https://github.com/Syntax753/decent-stella)
-
-* IDE Setup
-
-IDE -> Firebase Studio (ex Project IDX) (https://studio.firebase.google.com/)
-
-**Note**
-
-The connection from Firebase Studio localhost is throttled. This means it is not a viable platform for running Decent apps. These should be run locally instead (VSCode, etc)
 
 # Setup
 
@@ -49,7 +41,10 @@ npm run dev
 # Dev
 
 1. Add application logic in homescreen/
-1. 
+
+# Deploy to Decent
+
+https://decentapps.net/info/partner-deployment-guide.html
 
 # Contact
 
@@ -71,3 +66,4 @@ https://github.com/erikh2000/create-decent-app
 The Fellowship of The Ring (TODO: check license):
 
 http://github.com/ganesh-k13/shell/blob/master/test_search/www.glozman.com/TextPages/01%20-%20The%20Fellowship%20Of%20The%20Ring.txt
+

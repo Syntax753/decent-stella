@@ -1,4 +1,4 @@
-import ConfirmCancelDialog from "@/components/modalDialogs/ConfirmCancelDialog";
+import OkayDialog from "@/components/modalDialogs/OkayDialog";
 
 const description = `This dialog pauses things before doing the heavy work of loading the LLM, ` +
                     `which could otherwise be triggered on each code change. ` + 
@@ -7,19 +7,17 @@ const description = `This dialog pauses things before doing the heavy work of lo
 type Props = {
   isOpen:boolean,
   onConfirm:()=>void
-  onCancel:()=>void
 }
 
 function LLMDevPauseDialog(props:Props) {
-  const { isOpen, onConfirm, onCancel } = props;
+  const { isOpen, onConfirm } = props;
 
   if (!isOpen) return null;
 
   return (
-    <ConfirmCancelDialog 
+    <OkayDialog 
       title="Local Development" isOpen={isOpen} 
-      onConfirm={onConfirm} confirmText="Load LLM" 
-      onCancel={onCancel}
+      onOkay={onConfirm} okayText="Load LLM" 
       description={description} 
     />
   );

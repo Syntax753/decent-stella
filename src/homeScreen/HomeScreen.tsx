@@ -4,37 +4,49 @@ import { init } from "./interactions/initialization";
 import { GENERATING, submitPrompt } from "./interactions/prompt";
 import ContentButton from '@/components/contentButton/ContentButton';
 import { useEffect, useState } from "react";
-import LLMDevPauseDialog from './dialogs/LLMDevPauseDialog';
-import { useLocation } from 'wouter';
-import { LOAD_URL } from '@/common/urlUtil';
 
+import LoadScreen from '@/loadScreen/LoadScreen';
+import TopBar from '@/components/topBar/TopBar';
+
+// Custom Stella
 import { formatMapToString } from "@/data/conversion";
+import ProgressBar from '@/components/progressBar/ProgressBar';
 
 function HomeScreen() {
   // Output
   const [bardIntroText, setBardIntroText] = useState<string>('The Bard beckons your to her table');
-  const [charactersEgoText, setCharactersEgoText] = useState<string>('');
-  const [characterEgoDOM, setCharacterEgoDOM] = useState<string>('');
+  const [characterResponseText, setCharacterResponseText] = useState<string>('');
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [_, setCharactersEgoText] = useState<string>('');
+  const [characterEgo, setCharacterEgo] = useState<string>('');
 
   // Data Structs
   const [egoMap, setEgoMap] = useState<Map<string, string>>(new Map<string, string>());
+  const [eventMap, setEventMap] = useState<Map<string, Set<string>>>(new Map<string, Set<string>>());
 
   // UX
-  const [, setLocation] = useLocation();
-  const [modalDialog, setModalDialog] = useState<string | null>(null);
+  // const [modalDialog, setModalDialog] = useState<string | null>(null);
   const [taleSelection, setTaleSelection] = useState<string>('');
-  const [characterSelection, setSelectedCharacter] = useState<string>('');
+  const [characterSelection, setCharacterSelection] = useState<string>('');
+  const [eventSelection, setEventSelection] = useState<string>('');
+  const [characterPrompt, setCharacterPrompt] = useState<string>('');
 
-  // const [eventMap, setEventMap] = useState<Map<string, string>>(new Map<string, string>());
+  // Progress bar
+  const [percentComplete, setPercentComplete] = useState<number>(0.0);
+  const [estimateComplete, setEstimateComplete] = useState<string>('');
+  const [currentTask, setCurrentTask] = useState<string>('');
 
   const taleMap: { [key: string]: string } = {
     "the-story-of-syntax-and-the-little-dog": "the-story-of-syntax-and-the-little-dog.txt",
     "the-famous-five-on-treasure-island": "the-famous-five-on-treasure-island.txt",
     "the-fellowship-of-the-ring": "the-fellowship-of-the-ring.txt",
     "the-raven": "the-raven.txt",
+    "the-trial": "the-trial.txt",
+    "the-king-james-bible": "the-king-james-bible.txt"
   };
 
-  const BARD_SYSTEM_MESSAGE = "You love telling stories. " +
+  const BARD_SYSTEM_PROMPT = "You love telling stories. " +
     "You are carrying a lute and are sitting in the Timeless Tavern. " +
     "An adventurer enters the tavern and sits at a nearby table."
 
@@ -43,58 +55,34 @@ function HomeScreen() {
     "Invite the traveller to your table " +
     "Format the output using markdown. "
 
-  const CHARACTERS_SYSTEM_MESSAGE = `
-Name all the characters in the story along with their personality.
-Do not include characters that do not have a personality.
+  // const EVENTS_SYSTEM_MESSAGE =
+  //   "You will be given a story and will list each event in that story. " +
+  //   "Describe every event involving 2 or more people and list those who took part in it. " +
+  //   "For example " +
+  //   "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan " +
+  //   "Do not include an introduction. " +
+  //   "Do not include any other information. "
 
-1. Collect the character and personality from the story and populate the json.
-2. The fields in the json are
-  - Name: This is the character's name
-  - Ego: This is the character's personality
-
-- Example 1:
-
-{"name":"The Minotaur","ego":"Very friendly and likes apples"}
-{"name":"Icarus","ego":"Loves flying and sunny days" }
-
-- Example 2:
-
-{"name":"Mary","ego":"Quite contrary and loves silver bells"}
-{"name":"Humpty","ego":"Loves eating omelettes"}
-
-- Example 3:
-
-{"name":"Beethro","ego":"Enjoys exploring dangerous rooms"}
-{"name":"Halp","ego":"Causes trouble whereever he goes - but is helpful too"}
-
-- Do not provide an introduction.
-- Only respond with json objects.
-- Check for and correct any syntax errors in the json format.
-- If a character doesn't have specific details about their personalities, don't include them.
-`
-
-  const EVENTS_SYSTEM_MESSAGE =
-    "You will be given a story and will list each event in that story. " +
-    "Describe every event involving 2 or more people and list those who took part in it. " +
-    "For example " +
-    "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan " +
-    "Do not include an introduction. " +
-    "Do not include any other information. "
-
-  const CHARACTERS_EVENTS_SYSTEM_MESSAGE =
-    "You will be given a story and will list each character in that story. " +
-    "Please respond with just the name of the character and their attitudes. " +
-    "For example " +
-    "[John]|Very friendly and likes apples [Mary]|Very contrary and likes the sunrise [Paul]|Local blacksmith who enjoys long walks " +
-    "Do not include an introduction. " +
-    "Do not include any other information. " +
-    "Then describe every event involving 2 or more people and list those who took part in it. " +
-    "For example " +
-    "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan"
+  // const CHARACTERS_EVENTS_SYSTEM_MESSAGE =
+  //   "You will be given a story and will list each character in that story. " +
+  //   "Please respond with just the name of the character and their attitudes. " +
+  //   "For example " +
+  //   "[John]|Very friendly and likes apples [Mary]|Very contrary and likes the sunrise [Paul]|Local blacksmith who enjoys long walks " +
+  //   "Do not include an introduction. " +
+  //   "Do not include any other information. " +
+  //   "Then describe every event involving 2 or more people and list those who took part in it. " +
+  //   "For example " +
+  //   "[Going to the school]|Peter,Alice [Picking up the shopping]|Suzette [Buying a car]|Jonathan"
 
   useEffect(() => {
-    init(setLocation, setModalDialog).then(() => { });
-  })
+    if (isLoading) return;
+
+    init().then(isLlmConnected => {
+      if (!isLlmConnected) setIsLoading(true);
+    });
+  }, [isLoading]);
+
+  if (isLoading) return <LoadScreen onComplete={() => setIsLoading(false)} />;
 
   // UI Updates
   function _onBardResponse(text: string) {
@@ -102,91 +90,239 @@ Do not include characters that do not have a personality.
   }
 
   // Data Structure updates
-  function _onCharactersEgoResponse(ego: string | Map<string, string>) {
-    if (typeof ego === 'string') {
-      setCharactersEgoText(ego);
+  function _onCharactersEgoResponse(egoMap: string | Map<string, string>, eventMap: Map<string, Set<string>>) {
+    if (typeof egoMap === 'string') {
+      setCharactersEgoText(egoMap);
     } else {
-      setEgoMap(ego);
-      setCharactersEgoText(formatMapToString(ego));
+      setEgoMap(egoMap);
+      setEventMap(eventMap);
+      setCharactersEgoText(formatMapToString(egoMap));
     }
   }
 
+  // Data Structure updates
+  function _onCharacterResponse(text: string) {
+    setCharacterResponseText(text);
+  }
+
+  function _onProgressBarUpdate(percent: number, remainingFmt: string = '') {
+    // console.log('Progress Bar', percent, task, remainingFmt);
+    setPercentComplete(percent);
+    // setCurrentTask(task);
+    if (percent === 1) {
+      setEstimateComplete('The Bard puts down her Lute, as the Story has Come To Be in The Timeless Tavern...');
+    } else {
+      // console.log('Remaining', remainingFmt);
+      setEstimateComplete(remainingFmt);
+    }
+  }
+
+  // Handler for submitting the character prompt
+  const handleCharacterPromptSubmit = () => {
+    if (!characterPrompt.trim()) { // Prevent submitting empty or whitespace-only prompts
+      console.log("Character prompt is empty. Not submitting.");
+      return;
+    }
+
+    const systemPrompt = `Your name is ${characterSelection} and you are ${characterEgo}.`;
+    console.log("System prompt: ", systemPrompt);
+    console.log("Prompt: ", characterPrompt);
+    submitPrompt(
+      systemPrompt,
+      characterPrompt,
+      _onCharacterResponse
+    );
+  };
+
   const bardIntroDOM = bardIntroText === GENERATING ? <p>The Bard beckons you to her table<WaitingEllipsis /></p> : <p>{bardIntroText}</p>
-  const charactersEgoDOM = charactersEgoText === GENERATING ? <p>The Bard picks up her lute<WaitingEllipsis /></p> : <p>{charactersEgoText}</p>
 
   return (
     <div className={styles.container}>
+      <TopBar />
       <div className={styles.header}><h1>Welcome the Timeless Tavern where the Yarn of Yesteryear is Spun</h1></div>
       <div className={styles.content}>
 
         {bardIntroDOM}
         <br />
-        <ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_PROMPT, BARD_SYSTEM_MESSAGE, _onBardResponse)} />
+        <ContentButton text="Approach Table" onClick={() => submitPrompt(BARD_SYSTEM_PROMPT, BARD_PROMPT, _onBardResponse)} />
         <br />
         <br />
-        <p>
-          <label htmlFor="taleSelection">Tales of Yore</label><br /><br />
-          {<select
-            id="taleSelection"
-            value={taleSelection}
-            onChange={(e) => {
-              const selectedTale = e.target.value;
-              if (selectedTale === 'default') {
-                // TODO: Update the dropdown to match the 'top' default selection value. Doesn't update currently
-                setCharactersEgoText('');
-              } else {
-                setTaleSelection(selectedTale);
-                const taleFileName = taleMap[selectedTale];
-                if (taleFileName) {
-                  fetch(`/tales/${taleFileName}`)
-                    .then(response => response.text())
-                    .then((taleContent) => {
-                      submitPrompt(taleContent, CHARACTERS_SYSTEM_MESSAGE, _onCharactersEgoResponse, true);
-                    })
-                    .catch(error => console.error('Error loading tale:', error));
-                }
+        <hr />
+        <br />
+
+        {/* Tale Select */}
+        <label htmlFor="taleSelection">Tales of Yore</label><br /><br />
+        {<select
+          id="taleSelection"
+          value={taleSelection}
+          onChange={(e) => {
+
+            // Init
+            const selectedTale = e.target.value;
+            const selectElement = e.target as HTMLSelectElement;
+            const selectedIndex = selectElement.selectedIndex;
+            const selectedTaleTitle = selectElement.options[selectedIndex].text;
+
+            // Init Progress Bar
+            setCurrentTask('The Bard picks up her Lute, and Sings the Tale of ' + selectedTaleTitle);
+
+            if (selectedTale === 'default') {
+              // TODO: Update the dropdown to match the 'top' default selection value. Doesn't update currently
+              setCharactersEgoText('');
+            } else {
+              egoMap.clear();
+              eventMap.clear();
+
+              setTaleSelection(selectedTale);
+              setPercentComplete(0.0);
+              setEstimateComplete('');
+
+              setCharacterResponseText('');
+              setCharacterPrompt('');
+              setCharacterEgo('');
+              setCharactersEgoText('');
+
+              const taleFileName = taleMap[selectedTale];
+              if (taleFileName) {
+                fetch(`./tales/${taleFileName}`)
+                  .then(response => response.text())
+                  .then((taleContent) => {
+                    submitPrompt('', taleContent, _onCharactersEgoResponse, true, _onProgressBarUpdate);
+                  })
+                  .catch(error => console.error('Error loading tale:', error));
               }
-            }}
-          >
-            <option value="default">Select your journey</option>
-            <option value="the-story-of-syntax-and-the-little-dog">The Story of Syntax and the Little Dog (Syntax)</option>
-            <option value="the-famous-five-on-treasure-island">The Famous Five on Treasure Island (Blyton)</option>
-            <option value="the-fellowship-of-the-ring">The Fellowship of the Ring (Tolkien)</option>
-            <option value="the-raven">The Raven (Poe)</option>
-          </select>}
-        </p>
+            }
+          }}
+        >
+          <option value="default">Select your journey</option>
+          <option value="the-story-of-syntax-and-the-little-dog">The Story of Syntax and the Little Dog (Syntax)</option>
+          <option value="the-famous-five-on-treasure-island">The Famous Five on Treasure Island (Blyton)</option>
+          <option value="the-fellowship-of-the-ring">The Fellowship of the Ring (Tolkien)</option>
+          <option value="the-raven">The Raven (Poe)</option>
+          <option value="the-trial">The Trial (Kafka)</option>
+          <option value="the-king-james-bible">The King James Bible</option>
+        </select>}
+
         <br />
+        <br />
+        {/* Character Select */}
+
+        {/* Select hero */}
         {egoMap.size > 0 && (
-          <p>
-            <label htmlFor="characterSelection">The Hall of Heroes</label><br /><br />
-            {<select
-              id="characterSelection"
-              value={characterSelection}
-              onChange={(e) => { 
-                let characterPrompt = egoMap.get(e.target.value);
-                if (!characterPrompt) {
-                  console.error('Missing ego', e.target.value);
-                } else {
-                  setCharacterEgoDOM(characterPrompt);
-                }
+
+          <><label htmlFor="characterSelection">The Hall of Heroes</label><br /><br /><select
+            id="characterSelection"
+            value={characterSelection}
+            onChange={(e) => {
+              const selectedCharacter = e.target.value;
+              setCharacterSelection(selectedCharacter);
+
+              // Reset - move to separate reset function call perhaps
+              setCharacterResponseText('');
+              setCharacterPrompt('');
+              setCharacterEgo('');
+              setEventSelection(''); // Reset event selection
+
+              let characterEgo = egoMap.get(selectedCharacter);
+              if (!characterEgo) {
+                console.error('Missing ego', selectedCharacter);
+              } else {
+
+                setCharacterEgo(characterEgo);
               }
-              }>
-              <option value="">Select your Hero</option>
-              {egoMap.keys().map(name => (
-                <option key={name} value={name}>{name}</option>
-              ))}
-            </select>}
-            <p>
-            {characterEgoDOM}
-            </p>
-          </p>)}
+            }}>
+            <option value="">Select your Hero</option>
+            {Array.from(egoMap.keys()).sort().map(name => (
+              <option key={name} value={name}>{name}</option>))}
+          </select></>
+        )}
+
+        <br />
+        <br />
+
+        {/* Select event */}
+        {characterSelection && eventMap.get(characterSelection) && (
+
+          <><label htmlFor="eventSelection">Events Unfold..</label><br /><br /><select
+            id="eventSelection"
+            value={eventSelection}
+            onChange={(e) => {
+              const selectedEvent = e.target.value;
+              setEventSelection(selectedEvent);
+            }}>
+            <option value="">Select your Event</option>
+            {
+              // Get the Set of events for the selected character.
+              // The outer condition (characterSelection && eventMap.get(characterSelection))
+              // ensures eventsForCharacter is a Set<string> here.
+              // '!' asserts it's not undefined
+              Array.from(eventMap.get(characterSelection)!)
+                .sort() // Sorts the event strings alphabetically
+                .map(event => (<option key={event} value={event}>{event}</option>))}
+          </select></>
+        )}
         
-        {/* <p><input type="text" className={styles.promptBox} placeholder="Say anything to this screen" value={prompt} onKeyDown={_onKeyDown} onChange={(e) => setPrompt(e.target.value)}/>
-        <ContentButton text="Send" onClick={() => submitPrompt(prompt, setPrompt, _onRespond)} /></p> */}
-        {/* {charactersEgoDOM} */}
+        <br />
+        <br />
+
+        {characterEgo && (
+          <>
+            <input
+              type="text"
+              className={styles.promptBox}
+              placeholder="What sayeth?"
+              value={characterPrompt}
+              onChange={(e) => {
+                setCharacterPrompt(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault(); // Prevent default form submission or newline
+                  handleCharacterPromptSubmit();
+                }
+              }}
+            />
+            {/* Display characterEgo as text below the input */}
+            <p className={styles.characterEgoDisplay}>{characterEgo}</p>
+          </>
+        )}
+
+
+        {/* Character Input */}
+        <p>
+          {characterPrompt && (
+            <ContentButton
+              text="Send"
+              onClick={handleCharacterPromptSubmit}
+            />
+          )}
+        </p>
+
+        {/* Character Output */}
+        {characterResponseText && <p>{characterResponseText}</p>}
+
+        {/* Progress Bar */}
+        <br />
+        <br />
+        {currentTask && (
+          <div className={styles.progressBarContainer}>
+            {percentComplete < 1 ? (
+              <>
+                {currentTask} {(percentComplete * 100).toFixed(1)}%
+                <WaitingEllipsis />
+                <ProgressBar percentComplete={percentComplete} />
+                {estimateComplete}{" "}
+                {/* This will be the remaining time estimate during progress */}
+              </>
+            ) : (
+              estimateComplete // This will be the completion message when percentComplete is 1
+            )}
+          </div>
+        )}
+
       </div>
 
-      <LLMDevPauseDialog isOpen={modalDialog === LLMDevPauseDialog.name} onConfirm={() => setLocation(LOAD_URL)} onCancel={() => setModalDialog(null)} />
+      <br />
     </div>
   );
 }
