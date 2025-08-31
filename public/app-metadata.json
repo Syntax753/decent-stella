@@ -3,6 +3,8 @@
   "name":"Stella - a Decent Story Teller",  
   "description":"Welcome to the timeless Tavern, where the Yarn of Yester-year is Spun",  
   "supportedModels":[    
-    {"id":"Llama-3.1-8B-Instruct-q4f16_1-MLC-1k","appBehaviorSummary":"2025 Decent default model"} 
+    {"id":"Llama-3.2-1B-Instruct-q4f16_1-MLC","appBehaviorSummary":"I am a story teller"},    
+    {"id":"DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC","appBehaviorSummary":"I am a teller", "beta": true},    
+    {"id":"Hermes-2-Pro-Mistral-7B-q4f16_1-MLC","appBehaviorSummary":"I am a story", "beta": true}
   ]
 }
