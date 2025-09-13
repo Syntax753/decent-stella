@@ -79,8 +79,6 @@ export async function webLlmGenerate(connection:LLMConnection, llmMessages:LLMMe
   messageText = await engine.getMessage();
   
   onStatusUpdate(messageText, 1);
-    if (!chunkedMode) {
-    addAssistantMessageToChatHistory(llmMessages, messageText);
-  }
+  addAssistantMessageToChatHistory(llmMessages, messageText);
   return messageText;
 }
