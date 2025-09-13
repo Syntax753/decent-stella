@@ -94,8 +94,6 @@ export async function submitPrompt(systemPrompt: string = '', prompt: string, _o
   function chunkedOutput(_: string) {
   }
 
-  console.log("Setting system prompt", systemPrompt);
-
   setSystemMessage(systemPrompt);
   _onResponse(GENERATING);
 

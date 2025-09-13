@@ -106,7 +106,7 @@ export async function generate(systemPrompt: string, prompt:string, onStatusUpda
   //   return cachedResponse;
   // }
 
-  console.log(`Submitting prompt ${systemPrompt} / ${prompt.substring(0,50)}`);
+  // console.log(`Submitting prompt ${systemPrompt} / ${prompt.substring(0,50)}`);
 
   // let firstResponseTime = 0;
   // function _captureFirstResponse(status:string, percentComplete:number) {
@@ -119,18 +119,17 @@ export async function generate(systemPrompt: string, prompt:string, onStatusUpda
   console.log("Connected to LLM, generating...");
 
   if (clearChat) clearChatHistory();
-  setSystemMessage(systemPrompt);
 
   theConnection.state = LLMConnectionState.GENERATING;
 
   let message = '';
   // let requestTime = Date.now();
   switch(theConnection.connectionType) {
-    case LLMConnectionType.WEBLLM: message = await webLlmGenerate(theConnection, messages, prompt, onStatusUpdate, chunkedMode); break;
+    case LLMConnectionType.WEBLLM: message = await webLlmGenerate(theConnection, messages, systemPrompt, prompt, onStatusUpdate, chunkedMode); break;
     default: throw Error('Unexpected');
   }
   // updateModelDevicePerformanceHistory(theConnection.modelId, requestTime, firstResponseTime, Date.now(), _inputCharCount(prompt), message.length);
-  setCachedPromptResponse(prompt, message);
+  // setCachedPromptResponse(prompt, message);
   theConnection.state = LLMConnectionState.READY;
   return message;
 }
