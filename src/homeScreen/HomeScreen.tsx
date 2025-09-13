@@ -22,8 +22,10 @@ function HomeScreen() {
   const [characterEgo, setCharacterEgo] = useState<string>('');
 
   // Data Structs
+  
   const [egoMap, setEgoMap] = useState<Map<string, string>>(new Map<string, string>());
   const [eventMap, setEventMap] = useState<Map<string, Set<string>>>(new Map<string, Set<string>>());
+  const [charactersTimeline, setCharactersTimeline] = useState<Set<string>[]>([]);
 
   // UX
   // const [modalDialog, setModalDialog] = useState<string | null>(null);
@@ -105,16 +107,22 @@ function HomeScreen() {
     setCharacterResponseText(text);
   }
 
-  function _onProgressBarUpdate(percent: number, remainingFmt: string = '') {
+  function _onProgressBarUpdate(percent: number, task: string, remainingFmt: string = '', idx: number, charactersInChunkForIdx: Set<string>) {
     // console.log('Progress Bar', percent, task, remainingFmt);
     setPercentComplete(percent);
     // setCurrentTask(task);
     if (percent === 1) {
       setEstimateComplete('The Bard puts down her Lute, as the Story has Come To Be in The Timeless Tavern...');
     } else {
-      // console.log('Remaining', remainingFmt);
       setEstimateComplete(remainingFmt);
     }
+
+    // Update characters in chunk
+    setCharactersTimeline(prev => {
+      const newCharactersTimeline = [...prev];
+      newCharactersTimeline[idx] = charactersInChunkForIdx;
+      return newCharactersTimeline;
+    });
   }
 
   // Handler for submitting the character prompt
@@ -169,10 +177,12 @@ function HomeScreen() {
             if (selectedTale === 'default') {
               // TODO: Update the dropdown to match the 'top' default selection value. Doesn't update currently
               setCharactersEgoText('');
+              setCharactersTimeline([]);
             } else {
               egoMap.clear();
               eventMap.clear();
 
+              setCharactersTimeline([]);
               setTaleSelection(selectedTale);
               setPercentComplete(0.0);
               setEstimateComplete('');
@@ -300,6 +310,8 @@ function HomeScreen() {
 
         {/* Character Output */}
         {characterResponseText && <p>{characterResponseText}</p>}
+
+        
 
         {/* Progress Bar */}
         <br />

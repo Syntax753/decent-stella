@@ -11,7 +11,6 @@ import {
   ChatCompletionMessageParam,
 } from "@mlc-ai/web-llm";
 import LLMMessage from "./types/LLMMessage";
-import { setSystemMessage, setAssistantMessage } from "./llmUtil";
 
 // A safe way to convert from WebLLM-specific message format to the format used by the chat history. The two formats are the same as I write this, 
 // but this function should catch breakages if the WebLLM format changes.

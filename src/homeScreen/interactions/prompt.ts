@@ -89,7 +89,13 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function submitPrompt(systemPrompt: string = '', prompt: string, _onResponse: Function, chunkedMode: boolean = false, _onProgress?: Function) {
+export async function submitPrompt(
+  systemPrompt: string = '',
+  prompt: string,
+  _onResponse: Function,
+  chunkedMode: boolean = false,
+  _onProgress?: (percent: number, task: string, remainingFmt: string, idx: number, charactersTimeline: Set<string>) => void
+) {
 
   function chunkedOutput(_: string) {
   }
@@ -125,6 +131,22 @@ export async function submitPrompt(systemPrompt: string = '', prompt: string, _o
       for (let idx = 0; idx < chunks.length; idx++) {
         // Get character perspective
         let egos = await generate(CHARACTERS_SYSTEM_MESSAGE, chunks[idx], (status: string) => chunkedOutput(status), chunkedMode);
+
+        const characterNamesInChunk = new Set<string>();
+        if (egos) {
+          try {
+            const currentChunkEgos: { name: string }[] = JSON.parse(egos);
+            if (Array.isArray(currentChunkEgos)) {
+              for (const char of currentChunkEgos) {
+                if (char.name) {
+                  characterNamesInChunk.add(char.name);
+                }
+              }
+            }
+          } catch (e) {
+            console.error('Error parsing character egos from LLM response:', e);
+          }
+        }
         egoMap = mergeEgosFromJSONStrings(egos, egoMap, ". ");
 
         // Get events
@@ -142,7 +164,7 @@ export async function submitPrompt(systemPrompt: string = '', prompt: string, _o
         let remaining = (elapsed / percent) * (1 - percent);
         let remainingFmt = formatTime(remaining);
 
-        if (_onProgress) { _onProgress(percent, task, remainingFmt) };
+        if (_onProgress) { _onProgress(percent, task, remainingFmt, idx, characterNamesInChunk) };
 
         await delay(100); // Delay for 100 ms so user input can be proceessed
       }
