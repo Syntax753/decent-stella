@@ -32,7 +32,8 @@ let theConnection:LLMConnection = {
 let messages:LLMMessages = {
   chatHistory: [],
   maxChatHistorySize: 100,
-  systemMessage: null
+  systemMessage: null,
+  assistantMessage: null
 };
 
 let savedMessages:LLMMessages|null = null;
@@ -82,6 +83,10 @@ export function setSystemMessage(message:string|null) {
   messages.systemMessage = message;
 }
 
+export function setAssistantMessage(message:string|null) {
+  messages.assistantMessage = message;
+}
+
 export function setChatHistorySize(size:number) {
   messages.maxChatHistorySize = size;
 }
@@ -128,6 +133,8 @@ export async function generate(systemPrompt: string, prompt:string, onStatusUpda
     case LLMConnectionType.WEBLLM: message = await webLlmGenerate(theConnection, messages, systemPrompt, prompt, onStatusUpdate, chunkedMode); break;
     default: throw Error('Unexpected');
   }
+
+  console.log("WebLLM response", message);
   // updateModelDevicePerformanceHistory(theConnection.modelId, requestTime, firstResponseTime, Date.now(), _inputCharCount(prompt), message.length);
   // setCachedPromptResponse(prompt, message);
   theConnection.state = LLMConnectionState.READY;

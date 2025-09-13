@@ -11,7 +11,7 @@ import {
   ChatCompletionMessageParam,
 } from "@mlc-ai/web-llm";
 import LLMMessage from "./types/LLMMessage";
-import { setSystemMessage } from "./llmUtil";
+import { setSystemMessage, setAssistantMessage } from "./llmUtil";
 
 // A safe way to convert from WebLLM-specific message format to the format used by the chat history. The two formats are the same as I write this, 
 // but this function should catch breakages if the WebLLM format changes.
@@ -51,7 +51,7 @@ export async function webLlmConnect(modelId: string, connection: LLMConnection, 
 
 export async function webLlmGenerate(connection: LLMConnection, llmMessages: LLMMessages, systemPrompt: string, prompt: string, onStatusUpdate: StatusUpdateCallback, chunkedMode: boolean = false): Promise<string> {
   // console.log("WebLLM generate", llmMessages, systemPrompt, prompt);
-  const engine = connection.webLLMEngine; 
+  const engine = connection.webLLMEngine;
   if (!engine) throw Error('Unexpected');
 
   setSystemMessage(systemPrompt);
@@ -64,7 +64,7 @@ export async function webLlmGenerate(connection: LLMConnection, llmMessages: LLM
     messages,
     temperature: 0.0
   }
-  
+
   console.log("WebLLM request", request);
 
 

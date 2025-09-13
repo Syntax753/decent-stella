@@ -21,6 +21,8 @@ export function addToolMessageToChatHistory(messages:LLMMessages, message:string
 export function createChatHistory(messages:LLMMessages, prompt:string) {
   const chatHistory:LLMMessage[] = [];
   if (messages.systemMessage) chatHistory.push({role:'system', content:messages.systemMessage});
+  if (messages.assistantMessage) chatHistory.push({role:'assistant', content:messages.assistantMessage});
+
   for (const chatMessage of messages.chatHistory) { chatHistory.push(chatMessage); }
   chatHistory.push({role:'user', content:prompt});
   return chatHistory;
