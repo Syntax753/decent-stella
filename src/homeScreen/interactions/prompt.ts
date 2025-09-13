@@ -110,12 +110,10 @@ export async function submitPrompt(systemPrompt: string = '', prompt: string, _o
 
     // Single prompt
     if (!chunkedMode) {
-      console.log("Submitting prompt")
       generate(systemPrompt, prompt, (status: string) => _onResponse(status));
     }
     // Multiple prompts
     else {
-      console.log("Chunking prompt")
 
       let task = '';
       let egoMap = new Map<string, string>();

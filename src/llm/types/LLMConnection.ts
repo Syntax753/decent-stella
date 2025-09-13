@@ -5,6 +5,7 @@ import * as webllm from "@mlc-ai/web-llm";
 
 type LLMConnection = {
   state:LLMConnectionState,
+  modelId:string,
   webLLMEngine:webllm.MLCEngineInterface|null,
   serverUrl:string|null,
   connectionType:LLMConnectionType

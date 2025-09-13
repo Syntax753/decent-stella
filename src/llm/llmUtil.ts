@@ -6,23 +6,27 @@
   * call generate() to get a response for a prompt.
   * other APIs are there for setting system message, chat history, etc.
   
-  In CDA v2.0 there is just one connection type: WebLLM. Ollama was removed in v2.0, but Custom LLMs will allow configuring access to it. 
-  Custom LLMs are not supported yet because I've got some security concerns for using them with Decent Portal to work through.
-  But they are implemented in Hone, if you want to see - https://github.com/erikh2000/hone/tree/main/src/llm
+  There is just one connection type for now: WebLLM, but this is abstracted for future CDA updates that may add other LLM providers.
 */
+
+import { updateModelDeviceLoadHistory, updateModelDevicePerformanceHistory } from "decent-portal";
+
 import LLMConnection from "./types/LLMConnection";
 import LLMConnectionState from "./types/LLMConnectionState";
 import LLMConnectionType from "./types/LLMConnectionType";
 import LLMMessages from "./types/LLMMessages";
 import StatusUpdateCallback from "./types/StatusUpdateCallback";
 import { webLlmConnect, webLlmGenerate } from "./webLlmUtil";
-// import { getCachedPromptResponse, setCachedPromptResponse } from "./promptCache";
+import { getCachedPromptResponse, setCachedPromptResponse } from "./promptCache";
+
+const UNSPECIFIED_MODEL_ID = 'UNSPECIFIED';
 
 let theConnection:LLMConnection = {
-  state:LLMConnectionState.UNINITIALIZED,
-  webLLMEngine:null,
-  serverUrl:null,
-  connectionType:LLMConnectionType.NONE
+  modelId: UNSPECIFIED_MODEL_ID,
+  state: LLMConnectionState.UNINITIALIZED,
+  webLLMEngine: null,
+  serverUrl: null,
+  connectionType: LLMConnectionType.NONE
 }
 
 let messages:LLMMessages = {
@@ -41,6 +45,12 @@ function _clearConnectionAndThrow(message:string) {
   throw new Error(message);
 }
 
+function _inputCharCount(prompt:string):number {
+  return prompt.length + 
+    (messages.systemMessage ? messages.systemMessage.length : 0) + 
+    messages.chatHistory.reduce((acc, curr) => acc + curr.content.length, 0);
+}
+
 /*
   Public APIs
 */
@@ -49,10 +59,22 @@ export function isLlmConnected():boolean {
   return theConnection.state === LLMConnectionState.READY || theConnection.state === LLMConnectionState.GENERATING;
 }
 
-export async function connect(onStatusUpdate:StatusUpdateCallback) {
+// Useful for app code that needs to use model-specific prompts or has other model-specific behavior.
+export function getConnectionModelId():string {
+  if (theConnection.modelId = UNSPECIFIED_MODEL_ID) throw Error('Must connect before model ID can be known.');
+  return theConnection.modelId;
+}
+
+export async function connect(modelId:string, onStatusUpdate:StatusUpdateCallback) {
   if (isLlmConnected()) return;
   theConnection.state = LLMConnectionState.INITIALIZING;
-  if (!await webLlmConnect(theConnection, onStatusUpdate)) _clearConnectionAndThrow('Failed to connect to WebLLM.');
+  theConnection.modelId = modelId;
+  const startLoadTime = Date.now();
+  if (!await webLlmConnect(theConnection.modelId, theConnection, onStatusUpdate)) {
+    updateModelDeviceLoadHistory(theConnection.modelId, false);
+    _clearConnectionAndThrow('Failed to connect to WebLLM.');
+  }
+  updateModelDeviceLoadHistory(theConnection.modelId, true, Date.now() - startLoadTime);
   theConnection.state = LLMConnectionState.READY;
 }
 
@@ -84,50 +106,64 @@ export async function generate(systemPrompt: string, prompt:string, onStatusUpda
   //   return cachedResponse;
   // }
 
-  
-  // console.info('system', systemMessage);
-  // console.info('prompt', prompt)
+  const truncatedPrompt = prompt.length > 40 ? `${prompt.substring(0, 20)}...${prompt.slice(-20)}` : prompt;
+  console.log(`Submitting prompt ${systemPrompt} / ${truncatedPrompt}`);
 
-  // Wait for the LLM to be in the READY state
-  await waitForLLMReady();
+  let firstResponseTime = 0;
+  function _captureFirstResponse(status:string, percentComplete:number) {
+    if (!firstResponseTime) firstResponseTime = Date.now();
+    onStatusUpdate(status, percentComplete);
+  }
 
   if (!isLlmConnected()) throw Error('LLM connection is not initialized.');
   if (theConnection.state !== LLMConnectionState.READY) throw Error('LLM is not in ready state.');
 
   if (clearChat) clearChatHistory();
-
   setSystemMessage(systemPrompt);
 
   theConnection.state = LLMConnectionState.GENERATING;
+
   let message = '';
+  let requestTime = Date.now();
   switch(theConnection.connectionType) {
-    case LLMConnectionType.WEBLLM: message = await webLlmGenerate(theConnection, messages, prompt, onStatusUpdate, chunkedMode); break;
+    case LLMConnectionType.WEBLLM: message = await webLlmGenerate(theConnection, messages, prompt, _captureFirstResponse); break;
     default: throw Error('Unexpected');
   }
-  // setCachedPromptResponse(prompt, message);
+  updateModelDevicePerformanceHistory(theConnection.modelId, requestTime, firstResponseTime, Date.now(), _inputCharCount(prompt), message.length);
+  setCachedPromptResponse(prompt, message);
   theConnection.state = LLMConnectionState.READY;
   return message;
 }
 
-async function waitForLLMReady(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (theConnection.state === LLMConnectionState.READY) {
-      resolve();
-      return;
-    }
+// export async function generate(systemPrompt: string, prompt:string, onStatusUpdate:StatusUpdateCallback, chunkedMode: boolean = false, clearChat: boolean = true):Promise<string> {
+//   // const cachedResponse = getCachedPromptResponse(prompt); // If your app doesn't benefit from cached responses, just delete this block below.
+//   // if (cachedResponse) {
+//   //   onStatusUpdate(cachedResponse, 100);
+//   //   return cachedResponse;
+//   // }
 
-    const checkInterval = setInterval(() => {
-      if (theConnection.state === LLMConnectionState.READY) {
-        clearInterval(checkInterval);
-        resolve();
-      }
-    }, 50); // Check every 50 milliseconds (adjust as needed)
+  
+//   // console.info('system', systemMessage);
+//   // console.info('prompt', prompt)
 
-    // Optional: Add a timeout to prevent indefinite waiting
-    setTimeout(() => {
-      clearInterval(checkInterval);
-      console.error('Timeout waiting for LLM to be ready.');
-      reject(new Error('Timeout waiting for LLM to be ready.'));
-    }, 100000); // Wait for 100 seconds
-  });
-}
+//   // Wait for the LLM to be in the READY state
+//   // await waitForLLMReady();
+
+//   if (!isLlmConnected()) throw Error('LLM connection is not initialized.');
+//   if (theConnection.state !== LLMConnectionState.READY) throw Error('LLM is not in ready state.');
+
+//   if (clearChat) clearChatHistory();
+
+//   setSystemMessage(systemPrompt);
+
+//   theConnection.state = LLMConnectionState.GENERATING;
+//   let message = '';
+//   switch(theConnection.connectionType) {
+//     case LLMConnectionType.WEBLLM: message = await webLlmGenerate(theConnection, messages, prompt, onStatusUpdate, chunkedMode); break;
+//     default: throw Error('Unexpected');
+//   }
+//   updateModelDevicePerformanceHistory(theConnection.modelId, requestTime, firstResponseTime, Date.now(), _inputCharCount(prompt), message.length);
+//   // setCachedPromptResponse(prompt, message);
+//   theConnection.state = LLMConnectionState.READY;
+//   return message;
+// }
