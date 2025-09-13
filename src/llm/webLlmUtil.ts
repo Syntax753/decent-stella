@@ -55,9 +55,18 @@ export async function webLlmGenerate(connection: LLMConnection, llmMessages: LLM
   if (!engine) throw Error('Unexpected');
 
   console.log("WebLLM engine", engine);
-  setSystemMessage(systemPrompt);
+  // The `setSystemMessage` and `createChatHistory` combination was likely causing the system prompt's
+  // content (including examples) to be merged into the user prompt, leading to the model
+  // returning the examples as part of its response.
+  // By constructing the message list directly, we ensure the system prompt is correctly
+  // passed in a 'system' role message, separate from the 'user' role prompt.
+  const messagesForApi: LLMMessage[] = [
+    { role: 'system', content: systemPrompt },
+    ...llmMessages.chatHistory,
+    { role: 'user', content: prompt }
+  ];
+  const messages = _toChatCompletionMessages(messagesForApi);
 
-  const messages = _toChatCompletionMessages(createChatHistory(llmMessages, prompt));
   const request: ChatCompletionRequest = {
     n: 1,
     stream: true,
@@ -70,7 +79,6 @@ export async function webLlmGenerate(connection: LLMConnection, llmMessages: LLM
   }
 
   console.log("WebLLM request", request);
-
 
   if (!chunkedMode) {
     addUserMessageToChatHistory(llmMessages, prompt);
@@ -90,11 +98,27 @@ export async function webLlmGenerate(connection: LLMConnection, llmMessages: LLM
 
   // The LLM can sometimes return markdown fences or other text around the JSON.
   // We will try to extract the JSON content and ensure it is a JSON array.
-  const jsonStartIndex = messageText.indexOf('{');
-  const jsonEndIndex = messageText.lastIndexOf('}');
+  const firstBracket = messageText.indexOf('[');
+  const firstBrace = messageText.indexOf('{');
+  let jsonStartIndex = -1;
+
+  if (firstBracket === -1) {
+    jsonStartIndex = firstBrace;
+  } else if (firstBrace === -1) {
+    jsonStartIndex = firstBracket;
+  } else {
+    jsonStartIndex = Math.min(firstBracket, firstBrace);
+  }
+
+  const lastBracket = messageText.lastIndexOf(']');
+  const lastBrace = messageText.lastIndexOf('}');
+  const jsonEndIndex = Math.max(lastBracket, lastBrace);
+
   if (jsonStartIndex !== -1 && jsonEndIndex !== -1 && jsonEndIndex > jsonStartIndex) {
-    const extractedJson = messageText.substring(jsonStartIndex, jsonEndIndex + 1);
-    messageText = `[${extractedJson}]`;
+    let content = messageText.substring(jsonStartIndex, jsonEndIndex + 1);
+    // If multiple JSON arrays are returned, merge them into a single array string.
+    content = content.replace(/\]\s*\[/g, ',');
+    messageText = content.startsWith('[') ? content : `[${content}]`;
   }
 
   onStatusUpdate(messageText, 1);
