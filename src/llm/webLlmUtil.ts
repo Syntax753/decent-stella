@@ -89,11 +89,12 @@ export async function webLlmGenerate(connection: LLMConnection, llmMessages: LLM
   // messageText = await engine.getMessage();
 
   // The LLM can sometimes return markdown fences or other text around the JSON.
-  // We will try to extract just the JSON object from the response string to make it more robust.
+  // We will try to extract the JSON content and ensure it is a JSON array.
   const jsonStartIndex = messageText.indexOf('{');
   const jsonEndIndex = messageText.lastIndexOf('}');
   if (jsonStartIndex !== -1 && jsonEndIndex !== -1 && jsonEndIndex > jsonStartIndex) {
-    messageText = messageText.substring(jsonStartIndex, jsonEndIndex + 1);
+    const extractedJson = messageText.substring(jsonStartIndex, jsonEndIndex + 1);
+    messageText = `[${extractedJson}]`;
   }
 
   onStatusUpdate(messageText, 1);
