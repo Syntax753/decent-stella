@@ -54,6 +54,7 @@ export async function webLlmGenerate(connection: LLMConnection, llmMessages: LLM
   const engine = connection.webLLMEngine;
   if (!engine) throw Error('Unexpected');
 
+  console.log("WebLLM engine", engine);
   setSystemMessage(systemPrompt);
 
   const messages = _toChatCompletionMessages(createChatHistory(llmMessages, prompt));
@@ -62,7 +63,10 @@ export async function webLlmGenerate(connection: LLMConnection, llmMessages: LLM
     stream: true,
     seed: 0,
     messages,
-    temperature: 0.0
+    temperature: 0.0,
+    extra_body: {
+      "enable_thinking": false
+    }
   }
 
   console.log("WebLLM request", request);
@@ -80,7 +84,17 @@ export async function webLlmGenerate(connection: LLMConnection, llmMessages: LLM
     }
     onStatusUpdate(messageText, 0);
   }
-  messageText = await engine.getMessage();
+  // The full response is assembled from the stream. The `engine.getMessage()` call is from an older API
+  // and is not needed with the chat completions API. It can also return stale or incorrect results.
+  // messageText = await engine.getMessage();
+
+  // The LLM can sometimes return markdown fences or other text around the JSON.
+  // We will try to extract just the JSON object from the response string to make it more robust.
+  const jsonStartIndex = messageText.indexOf('{');
+  const jsonEndIndex = messageText.lastIndexOf('}');
+  if (jsonStartIndex !== -1 && jsonEndIndex !== -1 && jsonEndIndex > jsonStartIndex) {
+    messageText = messageText.substring(jsonStartIndex, jsonEndIndex + 1);
+  }
 
   onStatusUpdate(messageText, 1);
   if (!chunkedMode) {
