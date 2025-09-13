@@ -106,17 +106,17 @@ export async function generate(systemPrompt: string, prompt:string, onStatusUpda
   //   return cachedResponse;
   // }
 
-  const truncatedPrompt = prompt.length > 40 ? `${prompt.substring(0, 20)}...${prompt.slice(-20)}` : prompt;
-  console.log(`Submitting prompt ${systemPrompt} / ${truncatedPrompt}`);
+  console.log(`Submitting prompt ${systemPrompt} / ${prompt.substring(0,50)}`);
 
-  let firstResponseTime = 0;
-  function _captureFirstResponse(status:string, percentComplete:number) {
-    if (!firstResponseTime) firstResponseTime = Date.now();
-    onStatusUpdate(status, percentComplete);
-  }
+  // let firstResponseTime = 0;
+  // function _captureFirstResponse(status:string, percentComplete:number) {
+  // if (!firstResponseTime) firstResponseTime = Date.now();
+  //   onStatusUpdate(status, percentComplete);
+  // }
 
   if (!isLlmConnected()) throw Error('LLM connection is not initialized.');
   if (theConnection.state !== LLMConnectionState.READY) throw Error('LLM is not in ready state.');
+  console.log("Connected to LLM, generating...");
 
   if (clearChat) clearChatHistory();
   setSystemMessage(systemPrompt);
@@ -124,46 +124,15 @@ export async function generate(systemPrompt: string, prompt:string, onStatusUpda
   theConnection.state = LLMConnectionState.GENERATING;
 
   let message = '';
-  let requestTime = Date.now();
+  // let requestTime = Date.now();
   switch(theConnection.connectionType) {
-    case LLMConnectionType.WEBLLM: message = await webLlmGenerate(theConnection, messages, prompt, _captureFirstResponse); break;
+    case LLMConnectionType.WEBLLM: message = await webLlmGenerate(theConnection, messages, prompt, onStatusUpdate, chunkedMode); break;
     default: throw Error('Unexpected');
   }
-  updateModelDevicePerformanceHistory(theConnection.modelId, requestTime, firstResponseTime, Date.now(), _inputCharCount(prompt), message.length);
+  // updateModelDevicePerformanceHistory(theConnection.modelId, requestTime, firstResponseTime, Date.now(), _inputCharCount(prompt), message.length);
   setCachedPromptResponse(prompt, message);
   theConnection.state = LLMConnectionState.READY;
   return message;
 }
 
-// export async function generate(systemPrompt: string, prompt:string, onStatusUpdate:StatusUpdateCallback, chunkedMode: boolean = false, clearChat: boolean = true):Promise<string> {
-//   // const cachedResponse = getCachedPromptResponse(prompt); // If your app doesn't benefit from cached responses, just delete this block below.
-//   // if (cachedResponse) {
-//   //   onStatusUpdate(cachedResponse, 100);
-//   //   return cachedResponse;
-//   // }
 
-  
-//   // console.info('system', systemMessage);
-//   // console.info('prompt', prompt)
-
-//   // Wait for the LLM to be in the READY state
-//   // await waitForLLMReady();
-
-//   if (!isLlmConnected()) throw Error('LLM connection is not initialized.');
-//   if (theConnection.state !== LLMConnectionState.READY) throw Error('LLM is not in ready state.');
-
-//   if (clearChat) clearChatHistory();
-
-//   setSystemMessage(systemPrompt);
-
-//   theConnection.state = LLMConnectionState.GENERATING;
-//   let message = '';
-//   switch(theConnection.connectionType) {
-//     case LLMConnectionType.WEBLLM: message = await webLlmGenerate(theConnection, messages, prompt, onStatusUpdate, chunkedMode); break;
-//     default: throw Error('Unexpected');
-//   }
-//   updateModelDevicePerformanceHistory(theConnection.modelId, requestTime, firstResponseTime, Date.now(), _inputCharCount(prompt), message.length);
-//   // setCachedPromptResponse(prompt, message);
-//   theConnection.state = LLMConnectionState.READY;
-//   return message;
-// }

@@ -49,6 +49,7 @@ export async function webLlmConnect(modelId: string, connection: LLMConnection, 
 }
 
 export async function webLlmGenerate(connection: LLMConnection, llmMessages: LLMMessages, prompt: string, onStatusUpdate: StatusUpdateCallback, chunkedMode: boolean = false): Promise<string> {
+  console.log("WebLLM generate", connection, llmMessages, prompt);
   const engine = connection.webLLMEngine;
   if (!engine) throw Error('Unexpected');
 

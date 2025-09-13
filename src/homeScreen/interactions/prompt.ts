@@ -39,7 +39,7 @@ Name all the characters in the story and describe their personality.
 `
 
 const EVENTS_SYSTEM_MESSAGE = `
-Idenfity the the primary event in this scene and all the characters present and return an array of json objects.
+Identify the the primary event in this scene and all the characters present and return an array of json objects.
 There should only be one event per scene.
 
 1. Collect the primary event and the name of a character from the story and populate the json array.
@@ -93,6 +93,8 @@ export async function submitPrompt(systemPrompt: string = '', prompt: string, _o
 
   function chunkedOutput(_: string) {
   }
+
+  console.log("Setting system prompt", systemPrompt);
 
   setSystemMessage(systemPrompt);
   _onResponse(GENERATING);
