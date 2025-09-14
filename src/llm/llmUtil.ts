@@ -17,7 +17,7 @@ import LLMConnectionType from "./types/LLMConnectionType";
 import LLMMessages from "./types/LLMMessages";
 import StatusUpdateCallback from "./types/StatusUpdateCallback";
 import { webLlmConnect, webLlmGenerate } from "./webLlmUtil";
-import { getCachedPromptResponse, setCachedPromptResponse } from "./promptCache";
+// import { getCachedPromptResponse, setCachedPromptResponse } from "./promptCache";
 
 const UNSPECIFIED_MODEL_ID = 'UNSPECIFIED';
 
@@ -46,11 +46,11 @@ function _clearConnectionAndThrow(message:string) {
   throw new Error(message);
 }
 
-function _inputCharCount(prompt:string):number {
-  return prompt.length + 
-    (messages.systemMessage ? messages.systemMessage.length : 0) + 
-    messages.chatHistory.reduce((acc, curr) => acc + curr.content.length, 0);
-}
+// function _inputCharCount(prompt:string):number {
+//   return prompt.length + 
+//     (messages.systemMessage ? messages.systemMessage.length : 0) + 
+//     messages.chatHistory.reduce((acc, curr) => acc + curr.content.length, 0);
+// }
 
 /*
   Public APIs
