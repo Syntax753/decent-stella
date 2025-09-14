@@ -3,8 +3,16 @@
   "name":"Stella - a Decent Story Teller",  
   "description":"Welcome to the timeless Tavern, where the Yarn of Yester-year is Spun",  
   "supportedModels":[    
-    {"id":"Llama-3.2-1B-Instruct-q4f16_1-MLC","appBehaviorSummary":"I am a story teller"},    
-    {"id":"DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC","appBehaviorSummary":"I am a teller", "beta": true},    
-    {"id":"Hermes-2-Pro-Mistral-7B-q4f16_1-MLC","appBehaviorSummary":"I am a story", "beta": true}
+    {"id":"DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC","appBehaviorSummary":"DeepSeek 8B"},    
+    {"id":"Mistral-7B-Instruct-q4f16_1-MLC","appBehaviorSummary":"Mistral 7B"},
+    {"id":"Hermes-2-Pro-Mistral-7B-q4f16_1-MLC","appBehaviorSummary":"Hermes 7B"},    
+    {"id":"Mistral-7B-Chat-q4f16_1-MLC","appBehaviorSummary":"Mistral 7B Chat"},    
+    {"id":"Llama-2-7B-Instruct-q4f16_1-MLC","appBehaviorSummary":"Llama 2 7B"},    
+    {"id":"Llama-2-13B-Instruct-q4f16_1-MLC","appBehaviorSummary":"Llama 2 13B"},    
+    {"id":"Llama-2-70B-Instruct-q4f16_1-MLC","appBehaviorSummary":"Llama 2 70B"},    
+    {"id":"Llama-3.2-1B-Instruct-q4f16_1-MLC","appBehaviorSummary":"Llama 1B"},    
+    {"id":"Llama-3.2-7B-Instruct-q4f16_1-MLC","appBehaviorSummary":"Llama 3.2 7B"},    
+    {"id":"Llama-3.2-13B-Instruct-q4f16_1-MLC","appBehaviorSummary":"Llama 3.2 13B"},    
+    {"id":"Llama-3.2-70B-Instruct-q4f16_1-MLC","appBehaviorSummary":"Llama 3.2 70B"}
   ]
 }
