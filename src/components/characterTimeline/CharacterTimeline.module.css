@@ -64,3 +64,63 @@
   cursor: default;
   background-color: var(--character-bg-color);
 }
+
+.eventTimeline {
+  display: flex;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.eventGroup {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 20px; /* space for the brace and text */
+  min-width: 0; /* for flexbox */
+}
+
+.eventBraceContainer {
+  position: absolute;
+  bottom: 0;
+  left: 5px;
+  right: 5px;
+  text-align: center;
+}
+
+.eventBrace {
+  position: relative;
+  height: 10px;
+  border-bottom: 1px solid #888;
+  margin-bottom: 5px;
+}
+
+.eventBrace::before,
+.eventBrace::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  width: 10px;
+  height: 5px;
+  border: 1px solid #888;
+  border-top: none;
+}
+
+.eventBrace::before {
+  left: -1px;
+  border-right: none;
+  border-bottom-left-radius: 6px;
+}
+
+.eventBrace::after {
+  right: -1px;
+  border-left: none;
+  border-bottom-right-radius: 6px;
+}
+
+.eventName {
+  font-size: 0.8rem;
+  color: #ccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

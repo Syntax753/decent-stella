@@ -94,7 +94,7 @@ export async function submitPrompt(
   prompt: string,
   _onResponse: Function,
   chunkedMode: boolean = false,
-  _onProgress?: (percent: number, task: string, remainingFmt: string, idx: number, characterTimeline: Set<string>) => void
+  _onProgress?: (percent: number, task: string, remainingFmt: string, idx: number, characterTimeline: Set<string>, eventName: string) => void
 ) {
 
   function chunkedOutput(_: string) {
@@ -149,8 +149,22 @@ export async function submitPrompt(
         }
         egoMap = mergeEgosFromJSONStrings(egos, egoMap, ". ");
 
-        // Get events
+        // Get event for the chunk
         let events = await generate(EVENTS_SYSTEM_MESSAGE, chunks[idx], (status: string) => chunkedOutput(status), chunkedMode, false);
+        let eventNameInChunk = 'NONE';
+        if (events) {
+          try {
+            const currentChunkEvents: { event: string }[] = JSON.parse(events);
+            if (Array.isArray(currentChunkEvents) && currentChunkEvents.length > 0) {
+              // Assuming the primary event is the same for all entries in the chunk
+              if (currentChunkEvents[0].event && currentChunkEvents[0].event !== 'NONE') {
+                eventNameInChunk = currentChunkEvents[0].event;
+              }
+            }
+          } catch (e) {
+            console.error('Error parsing event from LLM response:', e);
+          }
+        }
         eventMap = mergeEventsFromJSONStrings(events, eventMap);
 
         console.log("Events", eventMap);
@@ -164,7 +178,7 @@ export async function submitPrompt(
         let remaining = (elapsed / percent) * (1 - percent);
         let remainingFmt = formatTime(remaining);
 
-        if (_onProgress) { _onProgress(percent, task, remainingFmt, idx, characterNamesInChunk) };
+        if (_onProgress) { _onProgress(percent, task, remainingFmt, idx, characterNamesInChunk, eventNameInChunk) };
 
         await delay(100); // Delay for 100 ms so user input can be proceessed
       }

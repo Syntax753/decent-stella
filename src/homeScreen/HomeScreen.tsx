@@ -27,6 +27,7 @@ function HomeScreen() {
   const [egoMap, setEgoMap] = useState<Map<string, string>>(new Map<string, string>());
   const [eventMap, setEventMap] = useState<Map<string, Set<string>>>(new Map<string, Set<string>>());
   const [characterTimeline, setCharacterTimeline] = useState<Set<string>[]>([]);
+  const [eventTimeline, setEventTimeline] = useState<string[]>([]);
 
   // UX
   // const [modalDialog, setModalDialog] = useState<string | null>(null);
@@ -108,7 +109,14 @@ function HomeScreen() {
     setCharacterResponseText(text);
   }
 
-  function _onProgressBarUpdate(percent: number, task: string, remainingFmt: string = '', idx: number, charactersInChunkForIdx: Set<string>) {
+  function _onProgressBarUpdate(
+    percent: number,
+    task: string,
+    remainingFmt: string = '',
+    idx: number,
+    charactersInChunkForIdx: Set<string>,
+    eventNameForIdx: string
+  ) {
     // console.log('Progress Bar', percent, task, remainingFmt);
     setPercentComplete(percent);
     // setCurrentTask(task);
@@ -123,6 +131,13 @@ function HomeScreen() {
       const newCharacterTimeline = [...prev];
       newCharacterTimeline[idx] = charactersInChunkForIdx;
       return newCharacterTimeline;
+    });
+
+    // Update event timeline
+    setEventTimeline(prev => {
+      const newEventTimeline = [...prev];
+      newEventTimeline[idx] = eventNameForIdx;
+      return newEventTimeline;
     });
   }
 
@@ -179,11 +194,13 @@ function HomeScreen() {
               // TODO: Update the dropdown to match the 'top' default selection value. Doesn't update currently
               setCharactersEgoText('');
               setCharacterTimeline([]);
+              setEventTimeline([]);
             } else {
               egoMap.clear();
               eventMap.clear();
 
               setCharacterTimeline([]);
+              setEventTimeline([]);
               setTaleSelection(selectedTale);
               setPercentComplete(0.0);
               setEstimateComplete('');
@@ -215,7 +232,7 @@ function HomeScreen() {
         </select>}
 
         <br />
-        <CharacterTimeline characterTimeline={characterTimeline} />
+        <CharacterTimeline characterTimeline={characterTimeline} eventTimeline={eventTimeline} />
 
         <br />
         <br />
