@@ -30,7 +30,7 @@
 }
 
 /* .chunk:hover {
-    /* Add a subtle overlay on hover instead of changing background color */
+    Add a subtle overlay on hover instead of changing background color
 } */
 
 .chunk:hover::after {

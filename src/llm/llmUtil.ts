@@ -9,7 +9,8 @@
   There is just one connection type for now: WebLLM, but this is abstracted for future CDA updates that may add other LLM providers.
 */
 
-import { updateModelDeviceLoadHistory, updateModelDevicePerformanceHistory } from "decent-portal";
+// import { updateModelDeviceLoadHistory, updateModelDevicePerformanceHistory } from "decent-portal";
+import { updateModelDeviceLoadHistory } from "decent-portal";
 
 import LLMConnection from "./types/LLMConnection";
 import LLMConnectionState from "./types/LLMConnectionState";

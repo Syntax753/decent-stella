@@ -3,7 +3,7 @@ import LLMConnectionType from "./types/LLMConnectionType";
 import LLMMessages from "./types/LLMMessages";
 import StatusUpdateCallback from "./types/StatusUpdateCallback";
 
-import { addAssistantMessageToChatHistory, addUserMessageToChatHistory, createChatHistory } from "./messageUtil";
+import { addAssistantMessageToChatHistory, addUserMessageToChatHistory } from "./messageUtil";
 
 import {
   CreateMLCEngine,

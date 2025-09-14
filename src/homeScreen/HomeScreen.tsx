@@ -111,7 +111,7 @@ function HomeScreen() {
 
   function _onProgressBarUpdate(
     percent: number,
-    task: string,
+    _: string,
     remainingFmt: string = '',
     idx: number,
     charactersInChunkForIdx: Set<string>,
