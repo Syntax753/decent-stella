@@ -6,6 +6,7 @@ import ContentButton from '@/components/contentButton/ContentButton';
 import { useEffect, useState } from "react";
 
 import LoadScreen from '@/loadScreen/LoadScreen';
+import CharacterTimeline from '@/components/characterTimeline/CharacterTimeline';
 import TopBar from '@/components/topBar/TopBar';
 
 // Custom Stella
@@ -25,7 +26,7 @@ function HomeScreen() {
   
   const [egoMap, setEgoMap] = useState<Map<string, string>>(new Map<string, string>());
   const [eventMap, setEventMap] = useState<Map<string, Set<string>>>(new Map<string, Set<string>>());
-  const [charactersTimeline, setCharactersTimeline] = useState<Set<string>[]>([]);
+  const [characterTimeline, setCharacterTimeline] = useState<Set<string>[]>([]);
 
   // UX
   // const [modalDialog, setModalDialog] = useState<string | null>(null);
@@ -118,10 +119,10 @@ function HomeScreen() {
     }
 
     // Update characters in chunk
-    setCharactersTimeline(prev => {
-      const newCharactersTimeline = [...prev];
-      newCharactersTimeline[idx] = charactersInChunkForIdx;
-      return newCharactersTimeline;
+    setCharacterTimeline(prev => {
+      const newCharacterTimeline = [...prev];
+      newCharacterTimeline[idx] = charactersInChunkForIdx;
+      return newCharacterTimeline;
     });
   }
 
@@ -177,12 +178,12 @@ function HomeScreen() {
             if (selectedTale === 'default') {
               // TODO: Update the dropdown to match the 'top' default selection value. Doesn't update currently
               setCharactersEgoText('');
-              setCharactersTimeline([]);
+              setCharacterTimeline([]);
             } else {
               egoMap.clear();
               eventMap.clear();
 
-              setCharactersTimeline([]);
+              setCharacterTimeline([]);
               setTaleSelection(selectedTale);
               setPercentComplete(0.0);
               setEstimateComplete('');
@@ -212,6 +213,9 @@ function HomeScreen() {
           <option value="the-trial">The Trial (Kafka)</option>
           <option value="the-king-james-bible">The King James Bible</option>
         </select>}
+
+        <br />
+        <CharacterTimeline characterTimeline={characterTimeline} />
 
         <br />
         <br />

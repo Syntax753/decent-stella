@@ -94,7 +94,7 @@ export async function submitPrompt(
   prompt: string,
   _onResponse: Function,
   chunkedMode: boolean = false,
-  _onProgress?: (percent: number, task: string, remainingFmt: string, idx: number, charactersTimeline: Set<string>) => void
+  _onProgress?: (percent: number, task: string, remainingFmt: string, idx: number, characterTimeline: Set<string>) => void
 ) {
 
   function chunkedOutput(_: string) {
