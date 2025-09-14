@@ -40,24 +40,27 @@ Name all the characters in the story and describe their personality.
 
 const EVENTS_SYSTEM_MESSAGE = `
 Identify the the primary event in this scene and all the characters present and return an array of json objects.
-There should only be one event per scene.
 
-1. Collect the primary event and the name of a character from the story and populate the json array.
+1. Collect the event and the name of a character from the story and populate the json array.
 2. The fields in the json are
   - event: This is the name of the event
   - character: This is the name of a character present
 
 - Example 1:
+
 [{"event":"The Maze","character":"The Minotaur"},{"event":"The Maze","character":"Icarus"}]
 
 - Example 2:
+
 [{"event":"The Wall","character":"Mary"},{"event":"The Wall","character":"Humpty"}]
 
 - Example 3:
+
 [{"event:"Dungeon","character":"Beethro"},{"event:"Dungeon","character":"Halph"}]
 
-- If you can't identify a primary event, specify the event as "NONE"
+- If you can't identify an event, specify the event as "NONE"
 - Do not use these examples in the output
+- There should only be one event per prompt, but multiple characters.
 - Do not provide an introduction.
 `
 

@@ -4,6 +4,7 @@ import styles from './CharacterTimeline.module.css';
 interface CharacterTimelineProps {
   characterTimeline: Set<string>[];
   eventTimeline: string[];
+  onCharacterClick: (character: string) => void;
 }
 
 function groupConsecutiveEvents(eventTimeline: string[]) {
@@ -25,7 +26,7 @@ function groupConsecutiveEvents(eventTimeline: string[]) {
   return groups;
 }
 
-const CharacterTimeline: React.FC<CharacterTimelineProps> = ({ characterTimeline, eventTimeline }) => {
+const CharacterTimeline: React.FC<CharacterTimelineProps> = ({ characterTimeline, eventTimeline, onCharacterClick }) => {
   if (!characterTimeline || characterTimeline.length === 0) {
     return null;
   }
@@ -37,23 +38,39 @@ const CharacterTimeline: React.FC<CharacterTimelineProps> = ({ characterTimeline
     <div className={styles.timelineContainer}>
       <div className={styles.timeline}>
         {characterTimeline.map((chunkCharacters, index) => {
-          let backgroundColorValue = 0;
-          if (numChunks > 1) {
-            backgroundColorValue = Math.round((index / (numChunks - 1)) * 255);
+          const timelineStartColor = { r: 197, g: 116, b: 49 }; // #c57431
+          const timelineEndColor = { r: 85, g: 85, b: 85 };   // #555
+
+          let chunkBg;
+
+          if (numChunks === 1) {
+            chunkBg = `rgb(${timelineStartColor.r}, ${timelineStartColor.g}, ${timelineStartColor.b})`;
+          } else {
+            const t_start = index / (numChunks - 1);
+            const r_start = Math.round(timelineStartColor.r + (timelineEndColor.r - timelineStartColor.r) * t_start);
+            const g_start = Math.round(timelineStartColor.g + (timelineEndColor.g - timelineStartColor.g) * t_start);
+            const b_start = Math.round(timelineStartColor.b + (timelineEndColor.b - timelineStartColor.b) * t_start);
+
+            const t_end = (index + 1) / (numChunks - 1);
+            const r_end = Math.round(timelineStartColor.r + (timelineEndColor.r - timelineStartColor.r) * t_end);
+            const g_end = Math.round(timelineStartColor.g + (timelineEndColor.g - timelineStartColor.g) * t_end);
+            const b_end = Math.round(timelineStartColor.b + (timelineEndColor.b - timelineStartColor.b) * t_end);
+
+            chunkBg = `linear-gradient(to right, rgb(${r_start}, ${g_start}, ${b_start}), rgb(${r_end}, ${g_end}, ${b_end}))`;
           }
 
           const chunkStyle = {
-            '--chunk-bg-color': `rgb(${backgroundColorValue}, ${backgroundColorValue}, ${backgroundColorValue})`,
-            '--chunk-text-color': backgroundColorValue < 128 ? '#e0e0e0' : '#202020',
-            '--character-bg-color': backgroundColorValue < 128 ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)',
+            background: chunkBg,
+            '--chunk-text-color': '#e0e0e0',
+            '--character-bg-color': 'rgba(0, 0, 0, 0.4)',
           } as React.CSSProperties;
 
           return (
             <div key={index} className={styles.chunk} style={chunkStyle}>
               <div className={styles.characterList}>
                 {Array.from(chunkCharacters).sort().map(character => (
-                  <div key={character} className={styles.character} title={character}>
-                    {character.substring(0, 8) + (character.length > 8 ? '…' : '')}
+                  <div key={character} className={styles.character} title={character} onClick={() => onCharacterClick(character)}>
+                    {character}
                   </div>
                 ))}
               </div>

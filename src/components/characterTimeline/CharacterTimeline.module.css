@@ -23,7 +23,6 @@
   justify-content: center;
   padding: 4px;
   box-sizing: border-box;
-  background-color: var(--chunk-bg-color);
 }
 
 .chunk:last-child {
@@ -47,10 +46,10 @@
 .characterList {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 2px 4px;
   justify-content: center;
   align-items: center;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   line-height: 1.2;
   max-height: 100%;
   overflow: hidden;
@@ -61,7 +60,7 @@
   padding: 2px 5px;
   border-radius: 4px;
   white-space: nowrap;
-  cursor: default;
+  cursor: pointer;
   background-color: var(--character-bg-color);
 }
 
@@ -75,7 +74,7 @@
   position: relative;
   display: flex;
   justify-content: center;
-  padding-bottom: 20px; /* space for the brace and text */
+  padding-bottom: 30px; /* space for the brace and text */
   min-width: 0; /* for flexbox */
 }
 
@@ -118,9 +117,7 @@
 }
 
 .eventName {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #ccc;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }

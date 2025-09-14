@@ -141,6 +141,23 @@ function HomeScreen() {
     });
   }
 
+  function handleCharacterSelectionChange(selectedCharacter: string) {
+    setCharacterSelection(selectedCharacter);
+
+    // Reset - move to separate reset function call perhaps
+    setCharacterResponseText('');
+    setCharacterPrompt('');
+    setCharacterEgo('');
+    setEventSelection(''); // Reset event selection
+
+    let characterEgo = egoMap.get(selectedCharacter);
+    if (!characterEgo) {
+      console.error('Missing ego', selectedCharacter);
+    } else {
+      setCharacterEgo(characterEgo);
+    }
+  }
+
   // Handler for submitting the character prompt
   const handleCharacterPromptSubmit = () => {
     if (!characterPrompt.trim()) { // Prevent submitting empty or whitespace-only prompts
@@ -232,7 +249,7 @@ function HomeScreen() {
         </select>}
 
         <br />
-        <CharacterTimeline characterTimeline={characterTimeline} eventTimeline={eventTimeline} />
+        <CharacterTimeline characterTimeline={characterTimeline} eventTimeline={eventTimeline} onCharacterClick={handleCharacterSelectionChange} />
 
         <br />
         <br />
@@ -244,24 +261,7 @@ function HomeScreen() {
           <><label htmlFor="characterSelection">The Hall of Heroes</label><br /><br /><select
             id="characterSelection"
             value={characterSelection}
-            onChange={(e) => {
-              const selectedCharacter = e.target.value;
-              setCharacterSelection(selectedCharacter);
-
-              // Reset - move to separate reset function call perhaps
-              setCharacterResponseText('');
-              setCharacterPrompt('');
-              setCharacterEgo('');
-              setEventSelection(''); // Reset event selection
-
-              let characterEgo = egoMap.get(selectedCharacter);
-              if (!characterEgo) {
-                console.error('Missing ego', selectedCharacter);
-              } else {
-
-                setCharacterEgo(characterEgo);
-              }
-            }}>
+            onChange={(e) => handleCharacterSelectionChange(e.target.value)}>
             <option value="">Select your Hero</option>
             {Array.from(egoMap.keys()).sort().map(name => (
               <option key={name} value={name}>{name}</option>))}
