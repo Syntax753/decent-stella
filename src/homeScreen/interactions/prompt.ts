@@ -1,5 +1,5 @@
 import { isServingLocally } from "@/developer/devEnvUtil";
-import { generate, isLlmConnected, setSystemMessage } from "@/llm/llmUtil";
+import { generate, isLlmConnected, isLlmReady, setSystemMessage } from "@/llm/llmUtil";
 import { mergeEgosFromJSONStrings } from "@/data/conversion";
 import { mergeEventsFromJSONStrings } from "@/data/conversion";
 
@@ -92,6 +92,13 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function waitForLlm(timeout: number = 30000) {
+  const startTime = Date.now();
+  while (!isLlmReady() && Date.now() - startTime < timeout) {
+    await delay(100);
+  }
+}
+
 export async function submitPrompt(
   systemPrompt: string = '',
   prompt: string,
@@ -119,6 +126,7 @@ export async function submitPrompt(
 
     // Single prompt
     if (!chunkedMode) {
+      await waitForLlm();
       generate(systemPrompt, prompt, (status: string) => _onResponse(status));
     }
     // Multiple prompts
@@ -133,6 +141,7 @@ export async function submitPrompt(
       let startTime = performance.now();
       for (let idx = 0; idx < chunks.length; idx++) {
         // Get character perspective
+        await waitForLlm();
         let egos = await generate(CHARACTERS_SYSTEM_MESSAGE, chunks[idx], (status: string) => chunkedOutput(status), chunkedMode);
 
         const characterNamesInChunk = new Set<string>();
@@ -153,6 +162,7 @@ export async function submitPrompt(
         egoMap = mergeEgosFromJSONStrings(egos, egoMap, ". ");
 
         // Get event for the chunk
+        await waitForLlm();
         let events = await generate(EVENTS_SYSTEM_MESSAGE, chunks[idx], (status: string) => chunkedOutput(status), chunkedMode, false);
         let eventNameInChunk = 'NONE';
         if (events) {
