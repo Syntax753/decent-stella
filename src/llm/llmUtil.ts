@@ -65,6 +65,10 @@ export function isLlmReady():boolean {
   return theConnection.state === LLMConnectionState.READY;
 }
 
+export function isLlmGenerating():boolean {
+  return theConnection.state === LLMConnectionState.GENERATING;
+}
+
 // Useful for app code that needs to use model-specific prompts or has other model-specific behavior.
 export function getConnectionModelId():string {
   if (theConnection.modelId = UNSPECIFIED_MODEL_ID) throw Error('Must connect before model ID can be known.');

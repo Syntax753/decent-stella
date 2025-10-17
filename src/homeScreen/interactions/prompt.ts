@@ -1,5 +1,5 @@
 import { isServingLocally } from "@/developer/devEnvUtil";
-import { generate, isLlmConnected, isLlmReady, setSystemMessage } from "@/llm/llmUtil";
+import { generate, isLlmConnected, isLlmGenerating, isLlmReady, setSystemMessage } from "@/llm/llmUtil";
 import { mergeEgosFromJSONStrings } from "@/data/conversion";
 import { mergeEventsFromJSONStrings } from "@/data/conversion";
 
@@ -33,9 +33,10 @@ Name all the characters in the story and describe their personality.
 
 [{"name":"Beethro","ego":"Enjoys exploring dangerous rooms"},{"name":"Halph","ego":"Causes trouble whereever he goes - but is helpful too"}]
 
-- If a character doesn't have specific details about their personalities, specify their personality as "NONE"
+- If a character doesn't have specific details about their personalities, remove them from the json array"
 - Do not use these examples in the output
 - Do not provide an introduction.
+- Ensure the output is valid JSON array or fix the output
 `
 
 const EVENTS_SYSTEM_MESSAGE = `
@@ -94,9 +95,13 @@ function delay(ms: number): Promise<void> {
 
 async function waitForLlm(timeout: number = 30000) {
   const startTime = Date.now();
-  while (!isLlmReady() && Date.now() - startTime < timeout) {
+  while (Date.now() - startTime < timeout) {
+    if (isLlmReady()) {
+      return;
+    }
     await delay(100);
   }
+  throw new Error("LLM did not become ready in time.");
 }
 
 export async function submitPrompt(
@@ -127,7 +132,7 @@ export async function submitPrompt(
     // Single prompt
     if (!chunkedMode) {
       await waitForLlm();
-      generate(systemPrompt, prompt, (status: string) => _onResponse(status));
+      await generate(systemPrompt, prompt, (status: string) => _onResponse(status));
     }
     // Multiple prompts
     else {
