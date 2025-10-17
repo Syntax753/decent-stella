@@ -1,5 +1,5 @@
 import { isServingLocally } from "@/developer/devEnvUtil";
-import { generate, isLlmConnected, isLlmGenerating, isLlmReady, setSystemMessage } from "@/llm/llmUtil";
+import { generate, isLlmConnected, isLlmReady, setSystemMessage } from "@/llm/llmUtil";
 import { mergeEgosFromJSONStrings } from "@/data/conversion";
 import { mergeEventsFromJSONStrings } from "@/data/conversion";
 

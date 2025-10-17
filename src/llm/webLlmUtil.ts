@@ -71,7 +71,7 @@ export async function webLlmGenerate(connection: LLMConnection, llmMessages: LLM
     stream: true,
     seed: 0,
     messages,
-    temperature: 0.0,
+    temperature: chunkedMode ? 0.0 : 0.7,
     extra_body: {
       "enable_thinking": false
     }
